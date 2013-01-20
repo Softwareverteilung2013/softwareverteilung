@@ -2,17 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ProjektSoftwareverteilung2013.Controller;
+using ProjektSoftwareverteilung2013.Models;
 
 namespace ProjektSoftwareverteilung2013
 {
     class Program
     {
+        private static ServerConnection connection = null;
         static void Main(string[] args)
         {
 
             Controller.Diagnostics.EventName = "Softwareverteilung2013";
             Controller.Diagnostics.WriteToEventLog("Server wird gestartet", System.Diagnostics.EventLogEntryType.Information, 1000);
             Console.WriteLine("starting...");
+
+            connection = new ServerConnection();
 
             String cmd = "";
             while (!cmd.ToLower().Equals("stop"))
@@ -21,6 +26,8 @@ namespace ProjektSoftwareverteilung2013
                 if (!cmd.ToLower().Equals("stop"))
                     Console.WriteLine("Unbekannter Befehl: " + cmd);
             }
+
+            connection.stopServer();
         }
     }
 }

@@ -21,8 +21,11 @@ namespace ProjektSoftwareverteilung2013.Controller
         public ServerConnection()
         {
             IPAddress ipAddress = getIpAddressFromString("127.0.0.1");
+            int port = 5555;
+            listener = new TcpListener(ipAddress, port);
 
-            listener = new TcpListener(ipAddress, 5555);
+            Console.WriteLine("Open listener with Port:"+ port);
+
             listener.Start();
             th = new Thread(new ThreadStart(RunNewConnection));
         }
@@ -47,6 +50,7 @@ namespace ProjektSoftwareverteilung2013.Controller
         {
             th.Abort();
             this.stopAllConnections();
+            Console.WriteLine("Alle Verbindungen wurden beendet");
             listener.Stop(); 
         }
 
@@ -106,12 +110,19 @@ namespace ProjektSoftwareverteilung2013.Controller
                 try
                 {
                     line = inStream.ReadLine();
-                    message += line;
-                    loop = !line.Equals("");
+                    
+                    if (!line.Equals("end"))
+                    {
+                        message += line;
+                    }
+
+                    loop = !line.Equals("end");
+                    
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     loop = false;
+                    Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3000);
                 }
             }
             return message;
@@ -129,9 +140,9 @@ namespace ProjektSoftwareverteilung2013.Controller
                 sendBytes = Encoding.ASCII.GetBytes(end);
                 outStream.Write(sendBytes, 0, sendBytes.Length);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-               
+                Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3000);
             }
 
             //this.stopConnection();
@@ -160,10 +171,19 @@ namespace ProjektSoftwareverteilung2013.Controller
                 case RequestTyp.getDatabaseSoftwarePackages:
                     break;
                 case RequestTyp.sendSoftwarePackage:
+                    if (!request.Client.admin)
+                    {
+                        break;
+                    }
+                    this.readFile();
+                    //Zum Gruppen Ordner Hizufügen
+                    result.successful = true;
+                    result.message = "FilenName:"; 
+                    result.type = ResultType.defaultInfo;
                     break;
                 case RequestTyp.setDatabaseClient:
 
-                    if (request.Client.admin)
+                    if (!request.Client.admin)
                     {
                         break;
                     }
