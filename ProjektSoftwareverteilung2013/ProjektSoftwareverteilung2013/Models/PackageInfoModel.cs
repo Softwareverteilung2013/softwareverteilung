@@ -10,6 +10,5 @@ namespace ProjektSoftwareverteilung2013.Models
         public int ID { get; set; }
         public string Name { get; set; }
         public int size { get; set; }
-        public int group { get; set; }
     }
 }
