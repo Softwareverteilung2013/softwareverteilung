@@ -12,6 +12,10 @@ namespace ProjektSoftwareverteilung2013
         private static ServerConnection connection = null;
         static void Main(string[] args)
         {
+            List<ClientInfoModel> olist = new List<ClientInfoModel>();
+            DataConverter oDataConverter = new DataConverter();
+
+            olist = oDataConverter.GetClientInfoModels();
 
             Controller.Diagnostics.EventName = "Softwareverteilung2013";
             Controller.Diagnostics.WriteToEventLog("Server wird gestartet", System.Diagnostics.EventLogEntryType.Information, 1000);
