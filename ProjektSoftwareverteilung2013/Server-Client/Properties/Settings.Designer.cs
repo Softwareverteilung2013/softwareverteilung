@@ -25,7 +25,7 @@ namespace Server_Client.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Datenbank\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Datenbank\\Softwareverteilung")]
         public string SavePath {
             get {
                 return ((string)(this["SavePath"]));

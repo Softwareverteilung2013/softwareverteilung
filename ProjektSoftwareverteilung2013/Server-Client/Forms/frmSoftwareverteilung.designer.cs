@@ -26,11 +26,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Programme");
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Benutzer");
             System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Default");
             System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Gruppen", new System.Windows.Forms.TreeNode[] {
             treeNode3});
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSoftwareverteilung));
             this.btnTransmit = new System.Windows.Forms.Button();
             this.ToolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.btnDeleteSoftware = new System.Windows.Forms.Button();
@@ -47,6 +49,7 @@
             this.TreeView1 = new System.Windows.Forms.TreeView();
             this.MenuStrip = new System.Windows.Forms.MenuStrip();
             this.btnAddExistingPacket = new System.Windows.Forms.Button();
+            this.icoSoftwareverteilung = new System.Windows.Forms.NotifyIcon(this.components);
             this.MenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -203,6 +206,15 @@
             this.btnAddExistingPacket.UseVisualStyleBackColor = true;
             this.btnAddExistingPacket.Click += new System.EventHandler(this.btnAddExistingPacket_Click);
             // 
+            // icoSoftwareverteilung
+            // 
+            this.icoSoftwareverteilung.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.icoSoftwareverteilung.BalloonTipText = "Softwareverteilung";
+            this.icoSoftwareverteilung.Icon = ((System.Drawing.Icon)(resources.GetObject("icoSoftwareverteilung.Icon")));
+            this.icoSoftwareverteilung.Text = "Softwareverteilung";
+            this.icoSoftwareverteilung.Visible = true;
+            this.icoSoftwareverteilung.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ShowForm);
+            // 
             // frmSoftwareverteilung
             // 
             this.ClientSize = new System.Drawing.Size(824, 472);
@@ -218,6 +230,7 @@
             this.Controls.Add(this.TreeView2);
             this.Controls.Add(this.TreeView1);
             this.Controls.Add(this.MenuStrip);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmSoftwareverteilung";
             this.Text = "Benutzerübersicht";
             this.MenuStrip.ResumeLayout(false);
@@ -245,6 +258,7 @@
         internal System.Windows.Forms.TreeView TreeView1;
         internal System.Windows.Forms.MenuStrip MenuStrip;
         internal System.Windows.Forms.Button btnAddExistingPacket;
+        private System.Windows.Forms.NotifyIcon icoSoftwareverteilung;
     }
 
 

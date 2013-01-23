@@ -19,6 +19,12 @@ using Server_Client.Classes;
         {
             InitializeComponent();
             TreeView1.Nodes[0].Expand();
+
+            if (!Directory.Exists(Server_Client.Properties.Settings.Default.SavePath + "\\Softwareverteilung"))
+            {
+                Directory.CreateDirectory(Server_Client.Properties.Settings.Default.SavePath + "\\Softwareverteilung");
+            }
+            
         }
 
         //Vergleich der Software kann nur gemacht werden, wenn sich clients beim laufen der software am server anmelden denn wohin sonst speichern? Für alle anderen die software aus den paketen nehmen 
@@ -321,6 +327,12 @@ using Server_Client.Classes;
         private void BeendenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void ShowForm(object sender, MouseEventArgs e)
+        {
+            this.TopMost = true;
+            this.TopMost = false;
         }
 
     } 

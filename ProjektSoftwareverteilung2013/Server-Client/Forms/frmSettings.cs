@@ -20,7 +20,7 @@ namespace Server_Client.Forms
         private void btnChangeSavePath_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog BrowserDialog = new FolderBrowserDialog();
-
+       
             if (BrowserDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 txtSavePath.Text = BrowserDialog.SelectedPath;
@@ -34,9 +34,14 @@ namespace Server_Client.Forms
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            Properties.Settings.Default.SavePath = txtSavePath.Text;
+            Properties.Settings.Default.SavePath = txtSavePath.Text + "\\Softwareverteilung";
             Properties.Settings.Default.ServerIP = txtServerIP.Text;
             Properties.Settings.Default.Save();
+
+            if (!System.IO.Directory.Exists(txtSavePath.Text + "\\Softwareverteilung"))
+            {
+                System.IO.Directory.CreateDirectory(txtSavePath.Text + "\\Softwareverteilung");
+            }
         }
 
     }

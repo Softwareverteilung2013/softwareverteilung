@@ -26,6 +26,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmNewName));
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnCommit = new System.Windows.Forms.Button();
             this.txtNewName = new System.Windows.Forms.TextBox();
@@ -67,6 +68,7 @@
             this.Controls.Add(this.btnCommit);
             this.Controls.Add(this.txtNewName);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmNewName";
             this.Text = "Bitte geben Sie einen Namen an";
             this.ResumeLayout(false);
