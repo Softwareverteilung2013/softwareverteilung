@@ -43,16 +43,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Connection.cs" />
+    <Compile Include="Controller\Connection.cs" />
     <Compile Include="Controller\Diagnostics.cs" />
     <Compile Include="Controller\RequestController.cs" />
-    <Compile Include="Controller\ResultController.cs" />
     <Compile Include="Models\ClientInfoModel.cs" />
     <Compile Include="Models\GroupInfoModel.cs" />
     <Compile Include="Models\PackageInfoModel.cs" />
     <Compile Include="Models\StandardRequestModel.cs" />
     <Compile Include="Models\StandardResultModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="sendRequest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

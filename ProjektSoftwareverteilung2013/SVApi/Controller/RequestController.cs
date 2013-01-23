@@ -2,9 +2,9 @@
 
 namespace SVApi.Controller
 {
-    public class RequestController
+    class RequestController
     {
-        public StandardRequestModel creatGetClientsRequest(ClientInfoModel client)
+        public static StandardRequestModel creatGetClientsRequest(ClientInfoModel client)
         {
             StandardRequestModel request = null;
             if (client == null)
@@ -18,7 +18,7 @@ namespace SVApi.Controller
             return request;
         }
 
-        public StandardRequestModel creatGetGroupsRequest(ClientInfoModel client)
+        public static StandardRequestModel creatGetGroupsRequest(ClientInfoModel client)
         {
             StandardRequestModel request = null;
             if (client == null)
@@ -32,7 +32,7 @@ namespace SVApi.Controller
             return request;
         }
 
-        public StandardRequestModel creatGetPackagesRequest(ClientInfoModel client)
+        public static StandardRequestModel creatGetPackagesRequest(ClientInfoModel client)
         {
             StandardRequestModel request = null;
             if (client == null)
@@ -46,7 +46,7 @@ namespace SVApi.Controller
             return request;
         }
 
-        public StandardRequestModel creatAddClientRequest(ClientInfoModel client, ClientInfoModel addClient)
+        public static StandardRequestModel creatAddClientRequest(ClientInfoModel client, ClientInfoModel addClient)
         {
             StandardRequestModel request = null;
             if (client == null)
@@ -60,7 +60,7 @@ namespace SVApi.Controller
             return request;
         }
 
-        public StandardRequestModel creatAddGroupRequest(ClientInfoModel client, GroupInfoModel addGroup)
+        public static StandardRequestModel creatAddGroupRequest(ClientInfoModel client, GroupInfoModel addGroup)
         {
             StandardRequestModel request = null;
             if (client == null)
@@ -74,7 +74,7 @@ namespace SVApi.Controller
             return request;
         }
 
-        public StandardRequestModel creatAddPackageRequest(ClientInfoModel client, PackageInfoModel addPackage)
+        public static StandardRequestModel creatAddPackageRequest(ClientInfoModel client, PackageInfoModel addPackage)
         {
             StandardRequestModel request = null;
             if (client == null)
@@ -88,7 +88,7 @@ namespace SVApi.Controller
             return request;
         }
 
-        public StandardRequestModel creatDelClientRequest(ClientInfoModel client, ClientInfoModel delClient)
+        public static StandardRequestModel creatDelClientRequest(ClientInfoModel client, ClientInfoModel delClient)
         {
             StandardRequestModel request = null;
             if (client == null)
@@ -102,7 +102,7 @@ namespace SVApi.Controller
             return request;
         }
 
-        public StandardRequestModel creatDelClientRequest(ClientInfoModel client, GroupInfoModel delGroup)
+        public static StandardRequestModel creatDelGroupRequest(ClientInfoModel client, GroupInfoModel delGroup)
         {
             StandardRequestModel request = null;
             if (client == null)
@@ -116,7 +116,7 @@ namespace SVApi.Controller
             return request;
         }
 
-        public StandardRequestModel creatDelClientRequest(ClientInfoModel client, PackageInfoModel delPackage)
+        public static StandardRequestModel creatDelPackageRequest(ClientInfoModel client, PackageInfoModel delPackage)
         {
             StandardRequestModel request = null;
             if (client == null)
@@ -130,7 +130,7 @@ namespace SVApi.Controller
             return request;
         }
 
-        public StandardRequestModel creatSendSoftwareRequest(ClientInfoModel client, GroupInfoModel group, PackageInfoModel package)
+        public static StandardRequestModel creatSendSoftwarePackageRequest(ClientInfoModel client, GroupInfoModel group, PackageInfoModel package)
         {
             StandardRequestModel request = null;
             if (client == null)
@@ -146,7 +146,7 @@ namespace SVApi.Controller
             return request;
         }
 
-        public StandardRequestModel creatUpdateRequest(ClientInfoModel client)
+        public static StandardRequestModel creatUpdateRequest(ClientInfoModel client)
         {
             StandardRequestModel request = null;
             if (client == null)
@@ -156,7 +156,7 @@ namespace SVApi.Controller
             request = new StandardRequestModel();
             request.Client = client;
             request.request = RequestTyp.upDateRequest;
-            request.requestData = client;
+            request.requestData = null;
             return request;
         }
     }

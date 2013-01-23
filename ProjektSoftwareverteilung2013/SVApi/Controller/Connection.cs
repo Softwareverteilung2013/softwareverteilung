@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
-using SVApi;
 using SVApi.Models;
 using System.IO;
 using ProjektSoftwareverteilung2013.Controller;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
-namespace SVApi
+namespace SVApi.Controller
 {
     public class Connection
     {
         private TcpClient ServerConnection = null;
         private IPEndPoint ConnectionInformation = null;
+        private Stream connectionStream = null;
 
-        public Connection(string ipAddress, StandardRequestModel rquest)
+        public Connection(string ipAddress)
         {
             int port = 5555;
             IPAddress mIpAddress = IPAddress.Parse(ipAddress);
@@ -36,6 +35,7 @@ namespace SVApi
                 return result;
             }
 
+            connectionStream = ServerConnection.GetStream();
             strRequest = JsonConvert.SerializeObject(request);
             sendStringStream(strRequest);
 
@@ -52,48 +52,35 @@ namespace SVApi
 
         private string readStream()
         {
-            StreamReader inStream = new StreamReader(ServerConnection.GetStream());
-            string message = null, line = null;
-            bool loop = true;
 
-            while (loop)
+            string message = null;
+            byte[] readingBytes = new byte[1024 * 10];
+            int len;
+            if (!connectionStream.CanRead)
             {
-                try
-                {
-                    line = inStream.ReadLine();
-
-                    if (!line.Equals("end"))
-                    {
-                        message += line;
-                    }
-
-                    loop = !line.Equals("end");
-
-                }
-                catch (Exception)
-                {
-                    loop = false;
-                    //Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3000);
-                }
+                return "";
             }
-            ServerConnection.Close();
-            ServerConnection = null;
+            while ((len = connectionStream.Read(readingBytes, 0, readingBytes.Length)) > 0)
+            {
+                break;
+            }
 
-            return message;
+            message = Encoding.ASCII.GetString(readingBytes);
+            string newString = Regex.Replace(message, "(\\s+)", " ");
+
+            return newString;
         }
 
         private void sendStringStream(string request)
         {
-            ServerConnection = new TcpClient(ConnectionInformation);
-            Stream outStream = ServerConnection.GetStream();
-            string end = "end";
+            if (!connectionStream.CanWrite)
+            {
+                return;
+            }
             try
             {
                 Byte[] sendBytes = Encoding.ASCII.GetBytes(request);
-                outStream.Write(sendBytes, 0, sendBytes.Length);
-
-                sendBytes = Encoding.ASCII.GetBytes(end);
-                outStream.Write(sendBytes, 0, sendBytes.Length);
+                connectionStream.Write(sendBytes, 0, sendBytes.Length);
             }
             catch (Exception)
             {
@@ -122,6 +109,11 @@ namespace SVApi
 
         private string readFileStream(string savePath)
         {
+            if (!connectionStream.CanRead)
+            {
+                return "";
+            }
+
             Socket clientSock = ServerConnection.Client;
             byte[] file = new byte[1024 * 5000];
             //Speicherort
@@ -150,7 +142,11 @@ namespace SVApi
             {
                 return false;
             }
-
+           
+            if (!connectionStream.CanWrite)
+            {
+                return false;
+            }
             sendFileToStream(pathToFile);
 
             return true;

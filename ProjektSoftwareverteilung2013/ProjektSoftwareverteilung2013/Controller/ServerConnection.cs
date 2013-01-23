@@ -9,6 +9,7 @@ using System.IO;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using ProjektSoftwareverteilung2013.Models;
+using System.Text.RegularExpressions;
 
 namespace ProjektSoftwareverteilung2013.Controller
 {
@@ -28,6 +29,7 @@ namespace ProjektSoftwareverteilung2013.Controller
 
             listener.Start();
             th = new Thread(new ThreadStart(RunNewConnection));
+            th.Start();
         }
 
 
@@ -67,10 +69,12 @@ namespace ProjektSoftwareverteilung2013.Controller
     class ServerThread
     {
         private TcpClient tcpConnection = null;
+        private Stream connectionStream = null;
 
         public ServerThread(TcpClient connection)
         {
             tcpConnection = connection;
+            connectionStream = tcpConnection.GetStream();
 
             StandardRequestModel request = readStream();
             if (request.Equals(""))
@@ -95,50 +99,41 @@ namespace ProjektSoftwareverteilung2013.Controller
 
         private StandardRequestModel readStream()
         {
-            StreamReader inStream = new StreamReader(tcpConnection.GetStream());
             StandardRequestModel request = null;
-            string message = null, line = null;
-            bool loop = true;
+            string message = null;
+            int len;
 
-            while (loop)
+            byte[] readingBytes = new byte[1024 * 100];
+            
+            if (!connectionStream.CanRead)
             {
-                try
-                {
-                    line = inStream.ReadLine();
-
-                    Console.WriteLine("Stream:" + line);
-
-                    if (!line.Equals("end"))
-                    {
-                        message += line;
-                    }
-
-                    loop = !line.Equals("end");
-
-                }
-                catch (Exception ex)
-                {
-                    loop = false;
-                    Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3000);
-                }
+                return null;
+            }
+            while ((len = connectionStream.Read(readingBytes, 0, readingBytes.Length)) > 0)
+            {
+                break;
             }
 
-            request = JsonConvert.DeserializeObject<StandardRequestModel>(message);
+            message = Encoding.ASCII.GetString(readingBytes);
+            string newString = Regex.Replace(message, "(\\s+)", " ");
+            Console.WriteLine(newString);
+
+            request = JsonConvert.DeserializeObject<StandardRequestModel>(newString);
             return request;
         }
 
         private void sendStringStream(StandardResultModel message)
         {
-            Stream outStream = tcpConnection.GetStream();
             string result = JsonConvert.SerializeObject(message);
-            string end = "end";
+            if (!connectionStream.CanWrite)
+            {
+                return;
+            }
+
             try
             {
                 Byte[] sendBytes = Encoding.ASCII.GetBytes(result);
-                outStream.Write(sendBytes, 0, sendBytes.Length);
-
-                sendBytes = Encoding.ASCII.GetBytes(end);
-                outStream.Write(sendBytes, 0, sendBytes.Length);
+                connectionStream.Write(sendBytes, 0, sendBytes.Length);
             }
             catch (Exception ex)
             {
