@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
-using ProjektSoftwareverteilung2013.Models;
+using SVApi.Models;
 using System.IO;
+using ProjektSoftwareverteilung2013.Controller;
+using System.Diagnostics;
 
 namespace SVApi
 {
@@ -14,12 +16,12 @@ namespace SVApi
         private TcpClient ServerConnection = null;
         private IPEndPoint ConnectionInformation = null;
 
-        public Connection(string ipAddress, bool admin)
+        public Connection(string ipAddress, StandardRequestModel rquest)
         {
             int port = 5555;
             IPAddress mIpAddress = IPAddress.Parse(ipAddress);
             ConnectionInformation = new IPEndPoint(mIpAddress,port);
-            //Connection = new TcpClient(ConnectionInformation);
+            ServerConnection = new TcpClient(ConnectionInformation);
         }
 
 
@@ -76,6 +78,51 @@ namespace SVApi
             //this.stopConnection();
         }
 
+        private void readFile()
+        {
+            Socket clientSock = ServerConnection.Client;
+            byte[] file = new byte[1024 * 5000];
+            //Speicherort
+            string receivedPath = "";
 
+            int receivedBytesLen = clientSock.Receive(file);
+            int fileNameLen = BitConverter.ToInt32(file, 0);
+            string fileName = Encoding.ASCII.GetString(file, 4, fileNameLen);
+
+            BinaryWriter bWrite = new BinaryWriter(File.Open(receivedPath + fileName, FileMode.Append));
+            bWrite.Write(file, 4 + fileNameLen, receivedBytesLen - 4 - fileNameLen);
+
+            bWrite.Close();
+
+        }
+
+        private void sendFile()
+        {
+            byte[] fileName = Encoding.ASCII.GetBytes("");
+            byte[] fileData = File.ReadAllBytes("");
+            byte[] fileNameLen = BitConverter.GetBytes(fileData.Length);
+            byte[] file = new byte[4 + fileName.Length + fileNameLen.Length];
+
+            fileNameLen.CopyTo(file, 0);
+            fileName.CopyTo(file, 4);
+            fileData.CopyTo(file, 4 + fileName.Length);
+
+            try
+            {
+                //using (Stream stream = tcpConnection.GetStream())
+                //{
+                //    stream.Write(file, 0, file.Length);
+                //    stream.Close();
+                //}
+
+                ServerConnection.Client.Send(file);
+                Console.WriteLine("File: {0} has been sent.", fileName);
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3000);
+            }
+
+        }
     }
 }

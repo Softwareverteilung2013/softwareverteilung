@@ -46,6 +46,7 @@
             this.TreeView2 = new System.Windows.Forms.TreeView();
             this.TreeView1 = new System.Windows.Forms.TreeView();
             this.MenuStrip = new System.Windows.Forms.MenuStrip();
+            this.btnAddExistingPacket = new System.Windows.Forms.Button();
             this.MenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -62,7 +63,7 @@
             // ToolStripMenuItem1
             // 
             this.ToolStripMenuItem1.Name = "ToolStripMenuItem1";
-            this.ToolStripMenuItem1.Size = new System.Drawing.Size(117, 6);
+            this.ToolStripMenuItem1.Size = new System.Drawing.Size(124, 6);
             // 
             // btnDeleteSoftware
             // 
@@ -81,20 +82,21 @@
             this.ToolStripMenuItem1,
             this.BeendenToolStripMenuItem});
             this.BearbeitenToolStripMenuItem.Name = "BearbeitenToolStripMenuItem";
-            this.BearbeitenToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
+            this.BearbeitenToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.BearbeitenToolStripMenuItem.Text = "Datei";
             // 
             // ServerToolStripMenuItem
             // 
             this.ServerToolStripMenuItem.Name = "ServerToolStripMenuItem";
-            this.ServerToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
+            this.ServerToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.ServerToolStripMenuItem.Text = "Server";
             // 
             // BeendenToolStripMenuItem
             // 
             this.BeendenToolStripMenuItem.Name = "BeendenToolStripMenuItem";
-            this.BeendenToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
+            this.BeendenToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.BeendenToolStripMenuItem.Text = "Beenden";
+            this.BeendenToolStripMenuItem.Click += new System.EventHandler(this.BeendenToolStripMenuItem_Click);
             // 
             // btnDeleteUser
             // 
@@ -120,7 +122,7 @@
             // 
             this.btnAddSoftware.Location = new System.Drawing.Point(349, 375);
             this.btnAddSoftware.Name = "btnAddSoftware";
-            this.btnAddSoftware.Size = new System.Drawing.Size(458, 23);
+            this.btnAddSoftware.Size = new System.Drawing.Size(227, 23);
             this.btnAddSoftware.TabIndex = 17;
             this.btnAddSoftware.Text = "Hinzufügen";
             this.btnAddSoftware.UseVisualStyleBackColor = true;
@@ -191,9 +193,20 @@
             this.MenuStrip.TabIndex = 23;
             this.MenuStrip.Text = "MenuStrip1";
             // 
+            // btnAddExistingPacket
+            // 
+            this.btnAddExistingPacket.Location = new System.Drawing.Point(580, 375);
+            this.btnAddExistingPacket.Name = "btnAddExistingPacket";
+            this.btnAddExistingPacket.Size = new System.Drawing.Size(227, 23);
+            this.btnAddExistingPacket.TabIndex = 24;
+            this.btnAddExistingPacket.Text = "Vorhandenes Paket hinzufügen";
+            this.btnAddExistingPacket.UseVisualStyleBackColor = true;
+            this.btnAddExistingPacket.Click += new System.EventHandler(this.btnAddExistingPacket_Click);
+            // 
             // frmSoftwareverteilung
             // 
             this.ClientSize = new System.Drawing.Size(824, 472);
+            this.Controls.Add(this.btnAddExistingPacket);
             this.Controls.Add(this.btnTransmit);
             this.Controls.Add(this.btnDeleteSoftware);
             this.Controls.Add(this.btnDeleteUser);
@@ -231,6 +244,7 @@
         internal System.Windows.Forms.TreeView TreeView2;
         internal System.Windows.Forms.TreeView TreeView1;
         internal System.Windows.Forms.MenuStrip MenuStrip;
+        internal System.Windows.Forms.Button btnAddExistingPacket;
     }
 
 

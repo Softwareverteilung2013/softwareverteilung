@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller\Diagnostics.cs" />
+    <Compile Include="Controller\FileController.cs" />
     <Compile Include="Controller\ServerConnection.cs" />
     <Compile Include="Datenbanken\Database.cs" />
     <Compile Include="Models\ClientInfoModel.cs" />

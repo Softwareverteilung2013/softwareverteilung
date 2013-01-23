@@ -146,12 +146,13 @@ namespace ProjektSoftwareverteilung2013.Controller
             //this.stopConnection();
         }
 
-        private void readFile()
+        private void readFile(GroupInfoModel group, PackageInfoModel package)
         {
             Socket clientSock = tcpConnection.Client;
             byte[] file = new byte[1024 * 5000];
-            //Speicherort
-            string receivedPath = "";
+
+            FileController fileController = new FileController();
+            string receivedPath = fileController.getPathFromFile(group.Name, package.Name);
 
             int receivedBytesLen = clientSock.Receive(file);
             int fileNameLen = BitConverter.ToInt32(file, 0);
@@ -168,10 +169,13 @@ namespace ProjektSoftwareverteilung2013.Controller
 
         }
 
-        private void sendFile()
+        private void sendFile(GroupInfoModel group, PackageInfoModel package)
         {
-            byte[] fileName = Encoding.ASCII.GetBytes("");
-            byte[] fileData = File.ReadAllBytes("");
+            FileController fileController = new FileController();
+            string filePath = fileController.getPathFromFile(group.Name, package.Name);
+
+            byte[] fileName = Encoding.ASCII.GetBytes(package.Name);
+            byte[] fileData = File.ReadAllBytes(filePath);
             byte[] fileNameLen = BitConverter.GetBytes(fileData.Length);
             byte[] file = new byte[4 + fileName.Length + fileNameLen.Length];
 
@@ -181,12 +185,6 @@ namespace ProjektSoftwareverteilung2013.Controller
 
             try
             {
-                //using (Stream stream = tcpConnection.GetStream())
-                //{
-                //    stream.Write(file, 0, file.Length);
-                //    stream.Close();
-                //}
-
                 tcpConnection.Client.Send(file);
                 Console.WriteLine("File: {0} has been sent.", fileName);
             }
