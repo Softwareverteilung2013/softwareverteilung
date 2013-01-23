@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using SVApi;
 using SVApi.Models;
 using System.IO;
 using ProjektSoftwareverteilung2013.Controller;
 using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace SVApi
 {
@@ -21,9 +23,32 @@ namespace SVApi
             int port = 5555;
             IPAddress mIpAddress = IPAddress.Parse(ipAddress);
             ConnectionInformation = new IPEndPoint(mIpAddress,port);
-            ServerConnection = new TcpClient(ConnectionInformation);
         }
 
+        public StandardResultModel startConnection(StandardRequestModel request)
+        {
+            StandardResultModel result = null;
+            string strRequest = null, strResult = null; 
+            ServerConnection = new TcpClient(ConnectionInformation);
+
+            if (!ServerConnection.Connected)
+            {
+                return result;
+            }
+
+            strRequest = JsonConvert.SerializeObject(request);
+            sendStringStream(strRequest);
+
+            strResult = readStream();
+            result = JsonConvert.DeserializeObject<StandardResultModel>(strResult);
+
+            return result;
+        }
+
+        public void closeConnection()
+        {
+            ServerConnection.Close();
+        }
 
         private string readStream()
         {
@@ -57,14 +82,14 @@ namespace SVApi
             return message;
         }
 
-        private void sendStringStream(string message)
+        private void sendStringStream(string request)
         {
             ServerConnection = new TcpClient(ConnectionInformation);
             Stream outStream = ServerConnection.GetStream();
             string end = "end";
             try
             {
-                Byte[] sendBytes = Encoding.ASCII.GetBytes(message);
+                Byte[] sendBytes = Encoding.ASCII.GetBytes(request);
                 outStream.Write(sendBytes, 0, sendBytes.Length);
 
                 sendBytes = Encoding.ASCII.GetBytes(end);
@@ -78,12 +103,29 @@ namespace SVApi
             //this.stopConnection();
         }
 
-        private void readFile()
+        public bool readFile(string savePath)
+        {
+            if (!ServerConnection.Connected)
+            {
+                return false;
+            }
+
+            string filePath = readFileStream(savePath);
+
+            if (!File.Exists(filePath))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private string readFileStream(string savePath)
         {
             Socket clientSock = ServerConnection.Client;
             byte[] file = new byte[1024 * 5000];
             //Speicherort
-            string receivedPath = "";
+            string receivedPath = savePath;
 
             int receivedBytesLen = clientSock.Receive(file);
             int fileNameLen = BitConverter.ToInt32(file, 0);
@@ -94,12 +136,33 @@ namespace SVApi
 
             bWrite.Close();
 
+            return receivedPath + fileName;
         }
 
-        private void sendFile()
+        public bool sendFile(string pathToFile)
         {
-            byte[] fileName = Encoding.ASCII.GetBytes("");
-            byte[] fileData = File.ReadAllBytes("");
+            if (!File.Exists(pathToFile))
+            {
+                return false;
+            }
+
+            if (!ServerConnection.Connected)
+            {
+                return false;
+            }
+
+            sendFileToStream(pathToFile);
+
+            return true;
+        }
+
+
+        private void sendFileToStream(string pathToFile)
+        {
+            string strName = Path.GetFileName(pathToFile);
+
+            byte[] fileName = Encoding.ASCII.GetBytes(strName);
+            byte[] fileData = File.ReadAllBytes(pathToFile);
             byte[] fileNameLen = BitConverter.GetBytes(fileData.Length);
             byte[] file = new byte[4 + fileName.Length + fileNameLen.Length];
 
@@ -109,12 +172,6 @@ namespace SVApi
 
             try
             {
-                //using (Stream stream = tcpConnection.GetStream())
-                //{
-                //    stream.Write(file, 0, file.Length);
-                //    stream.Close();
-                //}
-
                 ServerConnection.Client.Send(file);
                 Console.WriteLine("File: {0} has been sent.", fileName);
             }

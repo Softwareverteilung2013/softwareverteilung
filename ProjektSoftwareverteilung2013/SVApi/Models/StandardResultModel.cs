@@ -20,7 +20,7 @@ namespace SVApi.Models
         defaultInfo,
     };
 
-    class StandardResultModel
+    public class StandardResultModel
     {
         public bool successful { get; set; }
         public string message { get; set; }

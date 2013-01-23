@@ -84,7 +84,7 @@ namespace ProjektSoftwareverteilung2013.Controller
             {
                 stopConnection();
             }
-            setDatabaseClient(Client);
+            loginClient(Client);
 
             //Verarbeitung des Request
             StandardResultModel result = getResult(request);
@@ -105,6 +105,8 @@ namespace ProjektSoftwareverteilung2013.Controller
                 try
                 {
                     line = inStream.ReadLine();
+
+                    Console.WriteLine("Stream:" + line);
 
                     if (!line.Equals("end"))
                     {
@@ -174,6 +176,11 @@ namespace ProjektSoftwareverteilung2013.Controller
             FileController fileController = new FileController();
             string filePath = fileController.getPathFromFile(group.Name, package.Name);
 
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+
             byte[] fileName = Encoding.ASCII.GetBytes(package.Name);
             byte[] fileData = File.ReadAllBytes(filePath);
             byte[] fileNameLen = BitConverter.GetBytes(fileData.Length);
@@ -205,42 +212,19 @@ namespace ProjektSoftwareverteilung2013.Controller
 
             switch (request.request)
             {
-                case RequestTyp.getDatabaseClients:
+                case RequestTyp.upDateRequest:
                     break;
                 case RequestTyp.getDatabaseGroups:
                     break;
+                case RequestTyp.getDatabaseClients:
+                    break;
                 case RequestTyp.getDatabaseSoftwarePackages:
                     break;
-                case RequestTyp.sendSoftwarePackage:
-                    if (!request.Client.admin)
-                    {
-                        break;
-                    }
-                    this.readFile();
-                    //Zum Gruppen Ordner Hizufügen
-                    result.successful = true;
-                    result.message = "FilenName:";
-                    result.type = ResultType.defaultInfo;
-                    break;
                 case RequestTyp.addDatabaseClient:
-
-                    if (!request.Client.admin)
-                    {
-                        break;
-                    }
-                    ClientInfoModel client = (ClientInfoModel)request.requestData;
-                    success = setDatabaseClient(client);
-                    result.successful = success;
-                    result.message = "";
-                    result.result = null;
-                    result.type = ResultType.addClient;
-
                     break;
                 case RequestTyp.addDatabaseGroup:
                     break;
                 case RequestTyp.addDatabaseSoftwarePackage:
-                    break;
-                case RequestTyp.upDateRequest:
                     break;
                 case RequestTyp.delDatabaeClient:
                     break;
@@ -248,13 +232,15 @@ namespace ProjektSoftwareverteilung2013.Controller
                     break;
                 case RequestTyp.delDatabaseSoftwarePackage:
                     break;
+                case RequestTyp.sendSoftwarePackage:
+                    break;
                 default:
                     break;
             }
             return result;
         }
 
-        private bool setDatabaseClient(ClientInfoModel client)
+        private bool loginClient(ClientInfoModel client)
         {
             Console.WriteLine("Anmeldung Client:" + client.macAddress + " Gruppe:" + client.group + " Admin:" + client.admin);
             return false;

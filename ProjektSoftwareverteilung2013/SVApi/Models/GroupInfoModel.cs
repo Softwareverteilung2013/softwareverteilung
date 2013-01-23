@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SVApi.Models
 {
-    class GroupInfoModel
+    public class GroupInfoModel
     {
         public int ID { get; set; }
         public string Name { get; set; }

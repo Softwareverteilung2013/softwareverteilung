@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace SVApi.Models
+﻿namespace SVApi.Models
 {
-    enum RequestTyp
+    public enum RequestTyp
     {
         upDateRequest,
         getDatabaseGroups,
@@ -20,7 +15,7 @@ namespace SVApi.Models
         sendSoftwarePackage,
     };
 
-    class StandardRequestModel
+    public class StandardRequestModel
     {
         public RequestTyp request { get; set; }
         public object requestData { get; set; }

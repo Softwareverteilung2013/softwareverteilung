@@ -46,6 +46,7 @@
     <Compile Include="Connection.cs" />
     <Compile Include="Controller\Diagnostics.cs" />
     <Compile Include="Controller\RequestController.cs" />
+    <Compile Include="Controller\ResultController.cs" />
     <Compile Include="Models\ClientInfoModel.cs" />
     <Compile Include="Models\GroupInfoModel.cs" />
     <Compile Include="Models\PackageInfoModel.cs" />

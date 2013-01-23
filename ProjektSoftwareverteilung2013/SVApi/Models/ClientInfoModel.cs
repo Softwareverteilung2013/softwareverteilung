@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SVApi.Models
 {
-    class ClientInfoModel
+    public class ClientInfoModel
     {
         public int ID { get; set; }
         public string macAddress { get; set; }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SVApi.Models
 {
-    class PackageInfoModel
+    public class PackageInfoModel
     {
         public int ID { get; set; }
         public string Name { get; set; }
