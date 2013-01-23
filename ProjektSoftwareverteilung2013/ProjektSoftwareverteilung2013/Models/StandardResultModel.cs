@@ -10,10 +10,13 @@ namespace ProjektSoftwareverteilung2013.Models
         ClientInfo,
         GroupInfo,
         SoftwarePackagesInfo,
-        sendPackage,
         addClient,
         addGroup,
         addPackage,
+        delDatabaeClient,
+        delDatabaseGroup,
+        delDatabaseSoftwarePackage,
+        sendPackage,
         defaultInfo,
     };
 

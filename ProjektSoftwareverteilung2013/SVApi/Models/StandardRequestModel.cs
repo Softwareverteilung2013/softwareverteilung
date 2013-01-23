@@ -11,9 +11,12 @@ namespace ProjektSoftwareverteilung2013.Models
         getDatabaseGroups,
         getDatabaseClients,
         getDatabaseSoftwarePackages,
-        setDatabaseClient,
-        setDatabaseGroup,
-        setDatabaseSoftwarePackage,
+        addDatabaseClient,
+        addDatabaseGroup,
+        addDatabaseSoftwarePackage,
+        delDatabaeClient,
+        delDatabaseGroup,
+        delDatabaseSoftwarePackage,
         sendSoftwarePackage,
     };
 

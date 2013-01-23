@@ -11,7 +11,7 @@ namespace SVApi
 {
     public class Connection
     {
-        private TcpClient Connection = null;
+        private TcpClient ServerConnection = null;
         private IPEndPoint ConnectionInformation = null;
 
         public Connection(string ipAddress, bool admin)
@@ -25,7 +25,7 @@ namespace SVApi
 
         private string readStream()
         {
-            StreamReader inStream = new StreamReader(Connection.GetStream());
+            StreamReader inStream = new StreamReader(ServerConnection.GetStream());
             string message = null, line = null;
             bool loop = true;
 
@@ -49,16 +49,16 @@ namespace SVApi
                     //Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3000);
                 }
             }
-            Connection.Close();
-            Connection = null;
+            ServerConnection.Close();
+            ServerConnection = null;
 
             return message;
         }
 
         private void sendStringStream(string message)
         {
-            Connection = new TcpClient(ConnectionInformation);
-            Stream outStream = Connection.GetStream();
+            ServerConnection = new TcpClient(ConnectionInformation);
+            Stream outStream = ServerConnection.GetStream();
             string end = "end";
             try
             {

@@ -24,7 +24,7 @@ namespace ProjektSoftwareverteilung2013.Controller
             int port = 5555;
             listener = new TcpListener(ipAddress, port);
 
-            Console.WriteLine("Open listener with Port:"+ port);
+            Console.WriteLine("Open listener with Port:" + port);
 
             listener.Start();
             th = new Thread(new ThreadStart(RunNewConnection));
@@ -51,7 +51,7 @@ namespace ProjektSoftwareverteilung2013.Controller
             th.Abort();
             this.stopAllConnections();
             Console.WriteLine("Alle Verbindungen wurden beendet");
-            listener.Stop(); 
+            listener.Stop();
         }
 
         private void stopAllConnections()
@@ -67,41 +67,36 @@ namespace ProjektSoftwareverteilung2013.Controller
     class ServerThread
     {
         private TcpClient tcpConnection = null;
+
         public ServerThread(TcpClient connection)
         {
             tcpConnection = connection;
-            string message = readStream();
 
-            StandardRequestModel request = JsonConvert.DeserializeObject<StandardRequestModel>(message);
+            StandardRequestModel request = readStream();
             if (request.Equals(""))
-	        {
-		        stopConnection();
-	        }
+            {
+                stopConnection();
+            }
             ClientInfoModel Client = request.Client;
 
             //Aufruf der Datenbank speichern des Clients
             if (Client == null)
-	        {
-		        stopConnection();
-	        }
+            {
+                stopConnection();
+            }
             setDatabaseClient(Client);
 
             //Verarbeitung des Request
             StandardResultModel result = getResult(request);
 
-            message = JsonConvert.SerializeObject(result);
-            sendStringStream(message);
-
-            if (result == null)
-            {
-                stopConnection();
-            }
+            sendStringStream(result);
 
         }
 
-        private string readStream()
+        private StandardRequestModel readStream()
         {
             StreamReader inStream = new StreamReader(tcpConnection.GetStream());
+            StandardRequestModel request = null;
             string message = null, line = null;
             bool loop = true;
 
@@ -110,14 +105,14 @@ namespace ProjektSoftwareverteilung2013.Controller
                 try
                 {
                     line = inStream.ReadLine();
-                    
+
                     if (!line.Equals("end"))
                     {
                         message += line;
                     }
 
                     loop = !line.Equals("end");
-                    
+
                 }
                 catch (Exception ex)
                 {
@@ -125,16 +120,19 @@ namespace ProjektSoftwareverteilung2013.Controller
                     Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3000);
                 }
             }
-            return message;
+
+            request = JsonConvert.DeserializeObject<StandardRequestModel>(message);
+            return request;
         }
 
-        private void sendStringStream(string message)
+        private void sendStringStream(StandardResultModel message)
         {
             Stream outStream = tcpConnection.GetStream();
+            string result = JsonConvert.SerializeObject(message);
             string end = "end";
             try
             {
-                Byte[] sendBytes = Encoding.ASCII.GetBytes(message);
+                Byte[] sendBytes = Encoding.ASCII.GetBytes(result);
                 outStream.Write(sendBytes, 0, sendBytes.Length);
 
                 sendBytes = Encoding.ASCII.GetBytes(end);
@@ -150,10 +148,55 @@ namespace ProjektSoftwareverteilung2013.Controller
 
         private void readFile()
         {
+            Socket clientSock = tcpConnection.Client;
+            byte[] file = new byte[1024 * 5000];
+            //Speicherort
+            string receivedPath = "";
+
+            int receivedBytesLen = clientSock.Receive(file);
+            int fileNameLen = BitConverter.ToInt32(file, 0);
+            string fileName = Encoding.ASCII.GetString(file, 4, fileNameLen);
+
+            Console.WriteLine("Client:{0} connected & File {1} started received.", clientSock.RemoteEndPoint, fileName);
+
+            BinaryWriter bWrite = new BinaryWriter(File.Open(receivedPath + fileName, FileMode.Append));
+            bWrite.Write(file, 4 + fileNameLen, receivedBytesLen - 4 - fileNameLen);
+
+            bWrite.Close();
+
+            Console.WriteLine("File: {0} received & saved at path: {1}", fileName, receivedPath);
+
         }
 
         private void sendFile()
         {
+            byte[] fileName = Encoding.ASCII.GetBytes("");
+            byte[] fileData = File.ReadAllBytes("");
+            byte[] fileNameLen = BitConverter.GetBytes(fileData.Length);
+            byte[] file = new byte[4 + fileName.Length + fileNameLen.Length];
+
+            fileNameLen.CopyTo(file, 0);
+            fileName.CopyTo(file, 4);
+            fileData.CopyTo(file, 4 + fileName.Length);
+
+            try
+            {
+                //using (Stream stream = tcpConnection.GetStream())
+                //{
+                //    stream.Write(file, 0, file.Length);
+                //    stream.Close();
+                //}
+
+                tcpConnection.Client.Send(file);
+                Console.WriteLine("File: {0} has been sent.", fileName);
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3000);
+            }
+
+            stopConnection();
+
         }
 
         private StandardResultModel getResult(StandardRequestModel request)
@@ -178,10 +221,10 @@ namespace ProjektSoftwareverteilung2013.Controller
                     this.readFile();
                     //Zum Gruppen Ordner Hizufügen
                     result.successful = true;
-                    result.message = "FilenName:"; 
+                    result.message = "FilenName:";
                     result.type = ResultType.defaultInfo;
                     break;
-                case RequestTyp.setDatabaseClient:
+                case RequestTyp.addDatabaseClient:
 
                     if (!request.Client.admin)
                     {
@@ -195,11 +238,17 @@ namespace ProjektSoftwareverteilung2013.Controller
                     result.type = ResultType.addClient;
 
                     break;
-                case RequestTyp.setDatabaseGroup:
+                case RequestTyp.addDatabaseGroup:
                     break;
-                case RequestTyp.setDatabaseSoftwarePackage:
+                case RequestTyp.addDatabaseSoftwarePackage:
                     break;
                 case RequestTyp.upDateRequest:
+                    break;
+                case RequestTyp.delDatabaeClient:
+                    break;
+                case RequestTyp.delDatabaseGroup:
+                    break;
+                case RequestTyp.delDatabaseSoftwarePackage:
                     break;
                 default:
                     break;
@@ -217,5 +266,6 @@ namespace ProjektSoftwareverteilung2013.Controller
         {
             tcpConnection.Close();
         }
+
     }
 }
