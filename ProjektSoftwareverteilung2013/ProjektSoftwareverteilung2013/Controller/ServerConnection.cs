@@ -10,6 +10,7 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using ProjektSoftwareverteilung2013.Models;
 using System.Text.RegularExpressions;
+using ProjektSoftwareverteilung2013.Datenbanken;
 
 namespace ProjektSoftwareverteilung2013.Controller
 {
@@ -202,6 +203,7 @@ namespace ProjektSoftwareverteilung2013.Controller
         private StandardResultModel getResult(StandardRequestModel request)
         {
             StandardResultModel result = new StandardResultModel();
+            LocalDB dataBase = new LocalDB();
             bool success = false;
             result.successful = success;
 
