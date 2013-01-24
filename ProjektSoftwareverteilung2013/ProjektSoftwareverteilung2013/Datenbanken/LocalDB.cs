@@ -35,11 +35,26 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
             Connection.Close();
         }
 
-        public bool CheckSoftwareClient(ClientInfoModel oClient, PackageInfoModel oPackage)
+        public List<PackageInfoModel> CheckSoftwareClient(ClientInfoModel oClient)
         {
             //Prüfen welcher Client, welche Software hat.
 
-            return true;
+            try
+            {
+                List<PackageInfoModel> oResult = new List<PackageInfoModel>();
+                string sQry;
+                SqlCeCommand sqlCmd = new SqlCeCommand();
+
+                sQry = "";
+
+
+                return oResult;
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.WriteToEventLog(ex.Message, System.Diagnostics.EventLogEntryType.Error, 3102);
+                return null;
+            }
         }
 
         public bool gbAddGroup(GroupInfoModel oGroup)
@@ -54,9 +69,9 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
 
                 SQLCmd.CommandText = sQry;
                 SQLCmd.Connection = Connection;
-                SQLCmd.Connection.Open();
+                openConnection();
                 SQLCmd.ExecuteNonQuery();
-                SQLCmd.Connection.Close();
+                closeConnection();
 
                 return true;
             }
@@ -83,9 +98,9 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
 
                 SQLCmd.CommandText = sQry;
                 SQLCmd.Connection = Connection;
-                SQLCmd.Connection.Open();
+                openConnection();
                 SQLCmd.ExecuteNonQuery();
-                SQLCmd.Connection.Close();
+                closeConnection();
 
                 return true;
             }
