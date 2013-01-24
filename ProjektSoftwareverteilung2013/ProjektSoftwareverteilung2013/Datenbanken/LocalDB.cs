@@ -11,7 +11,8 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
 {
     class LocalDB
     {
-        public SqlCeConnection Connection { get; set; }
+        private SqlCeConnection Connection { get; set; }
+        public DataConverter Converter { get; set; }
 
         public LocalDB()
         {
@@ -20,14 +21,16 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
             dbfile += "Datenbanken\\SoftwareDB.sdf";
 
             Connection = new SqlCeConnection("Datasource=" + dbfile);
+
+            Converter = new DataConverter(Connection);
         }
 
-        public void openconnection()
+        private void openConnection()
         {
             Connection.Open();
         }
 
-        public void closeconnection()
+        private void closeConnection()
         {
             Connection.Close();
         }
@@ -95,7 +98,15 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
 
         public bool gbAddPackage(PackageInfoModel oPackage)
         {
-            // TODO: Neues Package anlegen.   
+            try
+            {
+                string sQry;
+                SqlCeCommand SQLCmd = new SqlCeCommand();
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.WriteToEventLog(ex.Message, System.Diagnostics.EventLogEntryType.Error, 3105);
+            }
 
             return true;
         }

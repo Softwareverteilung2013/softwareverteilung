@@ -15,11 +15,9 @@ namespace ProjektSoftwareverteilung2013.Controller
     {
         private SqlCeConnection Connection = null;
 
-        public DataConverter()
+        public DataConverter(SqlCeConnection oConn)
         {
-            LocalDB oDB = new LocalDB();
-
-            this.Connection = oDB.Connection;
+            this.Connection = oConn;
         }
 
         public List<ClientInfoModel> GetClientInfoModels()
@@ -36,6 +34,7 @@ namespace ProjektSoftwareverteilung2013.Controller
                 {
                     ClientInfoModel oClient = new ClientInfoModel();
 
+                    oClient.macAddress = oRow["Client_MacAdresse"].ToString();
                     oClient.admin = Convert.ToBoolean(oRow["Client_Administrator"]);
                     oClient.group = Convert.ToInt32(oRow["Client_Gruppe"]);
                     oClient.ID = Convert.ToInt32(oRow["Client_ID"]);
@@ -47,7 +46,7 @@ namespace ProjektSoftwareverteilung2013.Controller
             return oResult;
         }
 
-        public List<GroupInfoModel> GetGroupInfoModel()
+        public List<GroupInfoModel> GetGroupInfoModels()
         {
             List<GroupInfoModel> oResult = new List<GroupInfoModel>();
             DataTable oData = new DataTable();
@@ -71,7 +70,7 @@ namespace ProjektSoftwareverteilung2013.Controller
             return oResult;
         }
 
-        public List<PackageInfoModel> GetPackageInfoModel()
+        public List<PackageInfoModel> GetPackageInfoModels()
         {
             List<PackageInfoModel> oResult = new List<PackageInfoModel>();
             DataTable oData = new DataTable();

@@ -5,101 +5,101 @@ using System.Text;
 namespace Server_Client.Classes
 {
     using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Packaging;
- 
-public static class clsZipFile
-{
-    public static void ZipFiles(string path, IEnumerable<string> files, CompressionOption compressionLevel)
-    {
-        using (FileStream fileStream = new FileStream(path, FileMode.Create))
-        {
-            clsZipFile.ZipFilesToStream(fileStream, files, compressionLevel);
-        }
-    }
+    using System.Collections.Generic;
+    using System.IO;
+    using System.IO.Packaging;
 
-    public static void Unzip(string zipPath, string baseFolder)
+    public static class clsZipFile
     {
-        using (FileStream fileStream = new FileStream(zipPath, FileMode.Open))
+        public static void ZipFiles(string path, IEnumerable<string> files, CompressionOption compressionLevel)
         {
-            clsZipFile.UnzipFilesFromStream(fileStream, baseFolder);
-        }
-    }
-
-    private static void ZipFilesToStream(FileStream destination, IEnumerable<string> files, CompressionOption compressionLevel)
-    {
-        using (Package package = Package.Open(destination, FileMode.Create))
-        {
-            foreach (string path in files)
+            using (FileStream fileStream = new FileStream(path, FileMode.Create))
             {
-                Uri fileUri = new Uri(@"/" + Path.GetFileName(path), UriKind.Relative);
-                string contentType = @"data/" + clsZipFile.GetFileExtentionName(path);
- 
-                using (Stream zipStream = package.CreatePart(fileUri, contentType, compressionLevel).GetStream())
-                {
-
-                    CopyToStream(destination, zipStream);
-
-                }
+                clsZipFile.ZipFilesToStream(fileStream, files, compressionLevel);
             }
         }
-    }
- 
-    private static void UnzipFilesFromStream(Stream source, string baseFolder)
-    {
-        if (!Directory.Exists(baseFolder))
+
+        public static void Unzip(string zipPath, string baseFolder)
         {
-            Directory.CreateDirectory(baseFolder);
-        }
- 
-        using (Package package = Package.Open(source, FileMode.Open))
-        {
-            foreach (PackagePart zipPart in package.GetParts())
+            using (FileStream fileStream = new FileStream(zipPath, FileMode.Open))
             {
-                string path = Path.Combine(baseFolder, zipPart.Uri.ToString().Substring(1));
- 
-                using (Stream zipStream = zipPart.GetStream())
+                clsZipFile.UnzipFilesFromStream(fileStream, baseFolder);
+            }
+        }
+
+        private static void ZipFilesToStream(FileStream destination, IEnumerable<string> files, CompressionOption compressionLevel)
+        {
+            using (Package package = Package.Open(destination, FileMode.Create))
+            {
+                foreach (string path in files)
                 {
-                    using (FileStream fileStream = new FileStream(path, FileMode.Create))
+                    Uri fileUri = new Uri(@"/" + Path.GetFileName(path), UriKind.Relative);
+                    string contentType = @"data/" + clsZipFile.GetFileExtentionName(path);
+
+                    using (Stream zipStream = package.CreatePart(fileUri, contentType, compressionLevel).GetStream())
                     {
-                        CopyToFileStream(zipStream, fileStream);
+
+                        CopyToStream(destination, zipStream);
+
                     }
                 }
             }
         }
-    }
- 
-    private static string GetFileExtentionName(string path)
-    {
-        string extention = Path.GetExtension(path);
-        if (!string.IsNullOrEmpty(extention) && extention.StartsWith("."))
-        {
-            extention = extention.Substring(1);
-        }
- 
-        return extention;
-    }
 
-    public static void CopyToStream(FileStream input, Stream output)
-    {
-        byte[] buffer = new byte[32768];
-        int read;
-        while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+        private static void UnzipFilesFromStream(Stream source, string baseFolder)
         {
-            output.Write(buffer, 0, read);
-        }
-    }
+            if (!Directory.Exists(baseFolder))
+            {
+                Directory.CreateDirectory(baseFolder);
+            }
 
-    public static void CopyToFileStream(Stream input, FileStream output)
-    {
-        byte[] buffer = new byte[32768];
-        int read;
-        while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+            using (Package package = Package.Open(source, FileMode.Open))
+            {
+                foreach (PackagePart zipPart in package.GetParts())
+                {
+                    string path = Path.Combine(baseFolder, zipPart.Uri.ToString().Substring(1));
+
+                    using (Stream zipStream = zipPart.GetStream())
+                    {
+                        using (FileStream fileStream = new FileStream(path, FileMode.Create))
+                        {
+                            CopyToFileStream(zipStream, fileStream);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static string GetFileExtentionName(string path)
         {
-            output.Write(buffer, 0, read);
-        }
-    }
+            string extention = Path.GetExtension(path);
+            if (!string.IsNullOrEmpty(extention) && extention.StartsWith("."))
+            {
+                extention = extention.Substring(1);
+            }
 
-}
+            return extention;
+        }
+
+        public static void CopyToStream(FileStream input, Stream output)
+        {
+            byte[] buffer = new byte[32768];
+            int read;
+            while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                output.Write(buffer, 0, read);
+            }
+        }
+
+        public static void CopyToFileStream(Stream input, FileStream output)
+        {
+            byte[] buffer = new byte[32768];
+            int read;
+            while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                output.Write(buffer, 0, read);
+            }
+        }
+
+    }
 }

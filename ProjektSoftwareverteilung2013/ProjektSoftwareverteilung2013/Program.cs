@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using ProjektSoftwareverteilung2013.Controller;
 using ProjektSoftwareverteilung2013.Models;
+using ProjektSoftwareverteilung2013.Datenbanken;
 
 namespace ProjektSoftwareverteilung2013
 {
@@ -13,9 +14,7 @@ namespace ProjektSoftwareverteilung2013
         static void Main(string[] args)
         {
             List<ClientInfoModel> olist = new List<ClientInfoModel>();
-            DataConverter oDataConverter = new DataConverter();
-
-            olist = oDataConverter.GetClientInfoModels();
+            LocalDB oDB = new LocalDB();
 
             Controller.Diagnostics.EventName = "Softwareverteilung2013";
             Controller.Diagnostics.WriteToEventLog("Server wird gestartet", System.Diagnostics.EventLogEntryType.Information, 1000);
