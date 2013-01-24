@@ -9,6 +9,7 @@ namespace SVApi.Models
     {
         public int ID { get; set; }
         public string macAddress { get; set; }
+        public string pcName { get; set; }
         public int group { get; set; }
         public string arc { get; set; }
         public bool admin { get; set; }
