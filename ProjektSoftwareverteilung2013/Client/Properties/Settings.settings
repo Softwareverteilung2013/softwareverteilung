@@ -5,5 +5,11 @@
     <Setting Name="ServerIP" Type="System.String" Scope="User">
       <Value Profile="(Default)">192.168.123.1</Value>
     </Setting>
+    <Setting Name="SavePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\</Value>
+    </Setting>
+    <Setting Name="RequestTime" Type="System.String" Scope="User">
+      <Value Profile="(Default)">08:00</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

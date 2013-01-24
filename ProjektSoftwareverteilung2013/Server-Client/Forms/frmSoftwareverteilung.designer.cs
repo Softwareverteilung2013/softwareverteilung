@@ -27,13 +27,12 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Programme");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Benutzer");
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Pakete");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Clients");
             System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Default");
             System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Gruppen", new System.Windows.Forms.TreeNode[] {
             treeNode3});
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSoftwareverteilung));
-            this.btnTransmit = new System.Windows.Forms.Button();
             this.ToolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.btnDeleteSoftware = new System.Windows.Forms.Button();
             this.BearbeitenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -53,20 +52,10 @@
             this.MenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
-            // btnTransmit
-            // 
-            this.btnTransmit.Location = new System.Drawing.Point(580, 437);
-            this.btnTransmit.Name = "btnTransmit";
-            this.btnTransmit.Size = new System.Drawing.Size(227, 23);
-            this.btnTransmit.TabIndex = 22;
-            this.btnTransmit.Text = "Verteilen";
-            this.btnTransmit.UseVisualStyleBackColor = true;
-            this.btnTransmit.Click += new System.EventHandler(this.btnTransmit_Click);
-            // 
             // ToolStripMenuItem1
             // 
             this.ToolStripMenuItem1.Name = "ToolStripMenuItem1";
-            this.ToolStripMenuItem1.Size = new System.Drawing.Size(124, 6);
+            this.ToolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
             // 
             // btnDeleteSoftware
             // 
@@ -91,13 +80,14 @@
             // ServerToolStripMenuItem
             // 
             this.ServerToolStripMenuItem.Name = "ServerToolStripMenuItem";
-            this.ServerToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
-            this.ServerToolStripMenuItem.Text = "Server";
+            this.ServerToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.ServerToolStripMenuItem.Text = "Einstellungen";
+            this.ServerToolStripMenuItem.Click += new System.EventHandler(this.ServerToolStripMenuItem_Click);
             // 
             // BeendenToolStripMenuItem
             // 
             this.BeendenToolStripMenuItem.Name = "BeendenToolStripMenuItem";
-            this.BeendenToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.BeendenToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.BeendenToolStripMenuItem.Text = "Beenden";
             this.BeendenToolStripMenuItem.Click += new System.EventHandler(this.BeendenToolStripMenuItem_Click);
             // 
@@ -156,7 +146,7 @@
             this.TreeView3.Location = new System.Drawing.Point(349, 27);
             this.TreeView3.Name = "TreeView3";
             treeNode1.Name = "Software";
-            treeNode1.Text = "Programme";
+            treeNode1.Text = "Pakete";
             this.TreeView3.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1});
             this.TreeView3.Size = new System.Drawing.Size(458, 342);
@@ -167,7 +157,7 @@
             this.TreeView2.Location = new System.Drawing.Point(181, 27);
             this.TreeView2.Name = "TreeView2";
             treeNode2.Name = "User";
-            treeNode2.Text = "Benutzer";
+            treeNode2.Text = "Clients";
             this.TreeView2.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode2});
             this.TreeView2.Size = new System.Drawing.Size(162, 342);
@@ -217,9 +207,8 @@
             // 
             // frmSoftwareverteilung
             // 
-            this.ClientSize = new System.Drawing.Size(824, 472);
+            this.ClientSize = new System.Drawing.Size(824, 438);
             this.Controls.Add(this.btnAddExistingPacket);
-            this.Controls.Add(this.btnTransmit);
             this.Controls.Add(this.btnDeleteSoftware);
             this.Controls.Add(this.btnDeleteUser);
             this.Controls.Add(this.btnDeleteGroup);
@@ -242,7 +231,6 @@
 
         #endregion
 
-        internal System.Windows.Forms.Button btnTransmit;
         internal System.Windows.Forms.ToolStripSeparator ToolStripMenuItem1;
         internal System.Windows.Forms.Button btnDeleteSoftware;
         internal System.Windows.Forms.ToolStripMenuItem BearbeitenToolStripMenuItem;

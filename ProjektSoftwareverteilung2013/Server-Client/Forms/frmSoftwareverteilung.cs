@@ -10,11 +10,19 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.IO.Compression;
 using Server_Client.Classes;
+using SVApi;
+using SVApi.Models;
+using System.Net.NetworkInformation;
+using System.Text;
+using System.Security.Principal;
+using Server_Client.Forms;
 
     public partial class frmSoftwareverteilung : Form
     {
-
         public static string NewGroupName;
+        public static List<ClientInfoModel> ClientInfoModelArray;
+        public static sendRequest request = new sendRequest(Server_Client.Properties.Settings.Default.ServerIP);
+        public static ClientInfoModel client = new ClientInfoModel();
         public frmSoftwareverteilung()
         {
             InitializeComponent();
@@ -24,12 +32,20 @@ using Server_Client.Classes;
             {
                 Directory.CreateDirectory(Server_Client.Properties.Settings.Default.SavePath + "\\Softwareverteilung");
             }
-            
-        }
+            client.arc = GetArchitecture();
+            client.macAddress = GetMacAddress();
+            client.admin = GetAdminBool();
 
-        //Vergleich der Software kann nur gemacht werden, wenn sich clients beim laufen der software am server anmelden denn wohin sonst speichern? Für alle anderen die software aus den paketen nehmen 
-        //Software wie inoPhone in den Hintergrund mit Icon unten rechts
-        //Wann welches treeview leeren (selected index)
+            List<GroupInfoModel> clientList = null;
+            clientList = request.getDatabaseGroups(client);
+
+            foreach (GroupInfoModel Group in clientList)
+            {
+                TreeNode CurrentGroup = new TreeNode(Group.Name);
+                CurrentGroup.Tag = Group.ID;
+                TreeView1.Nodes[0].Nodes.Add(CurrentGroup);
+            }
+        }
 
 
         private void btnAddGroup_Click(object sender, EventArgs e)
@@ -68,8 +84,18 @@ using Server_Client.Classes;
                         System.IO.Directory.CreateDirectory(Server_Client.Properties.Settings.Default.SavePath + "Groups");
                     }
                     System.IO.Directory.CreateDirectory(Server_Client.Properties.Settings.Default.SavePath + "Groups\\" + NewGroupName);
+                    
+                    //Safe to DB                  
+                    GroupInfoModel group = new GroupInfoModel();
+                    group.Name = NewGroupName;
+                    group.ID = -1;
+                    NewListItem.Tag = request.addGroupInfo(client, group);
+                    if (Convert.ToInt32(NewListItem.Tag) == -1)
+                    {
+                    MessageBox.Show("Es ist ein Fehler beim Hinzufügen aufgetreten.", "Achtung",MessageBoxButtons.OK ,MessageBoxIcon.Error);
+                    NewListItem.Parent.Nodes.Remove(NewListItem);
+                    }
                     NewGroupName = "";
-                    //Safe to DB
                 }
             }
             else
@@ -105,8 +131,12 @@ using Server_Client.Classes;
                 if (MessageBox.Show("Möchten Sie die ausgewählte Gruppe mit allen enthaltenen Clients löschen?" , "Achtung!", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     System.IO.Directory.Delete(Server_Client.Properties.Settings.Default.SavePath + "Groups\\" + TreeView1.SelectedNode.Text, true);
+                    
+                    GroupInfoModel CurrentGroup = new GroupInfoModel();
+                    CurrentGroup.ID = Convert.ToInt32(TreeView1.SelectedNode.Tag); 
+                    request.delGroupInfo(client, CurrentGroup);
+                    
                     TreeView1.SelectedNode.Parent.Nodes.Remove(TreeView1.SelectedNode);
-                    //Alles Verweise aus DB entfernen
                 }
             }
 
@@ -122,11 +152,32 @@ using Server_Client.Classes;
             }
 
             TreeView2.Nodes.Clear();
-            //Füge Benutzer der Gruppe Default Treeview2 hinzu und füge Abbruch Button hinzu (Andere Treeviews disablen)
-            //Benutzer Selektiert und Bestätigt: Benutzer der selektieren Gruppe und den neuen Benutzer hinzufügen
-            //Neuen Benutzer in DB schreiben
-            //Abbruch: Benutzer der Gruppe laden
-            //Treeviews enablen & Abbruch Button raus
+            frmDefaulClients DefaultClients = new frmDefaulClients();
+            DefaultClients.ShowDialog();
+
+            foreach (ClientInfoModel CurrentClient in ClientInfoModelArray)
+            {
+                TreeNode CurrentNode = new TreeNode(CurrentClient.PcName);
+                CurrentNode.Tag = CurrentClient.ID;
+                TreeView2.Nodes[0].Nodes.Add(CurrentNode);
+
+                CurrentClient.group =Convert.ToInt32( TreeView1.SelectedNode.Tag);
+
+                List<ClientInfoModel> InfoModelArray = request.getDatabaseClients(client);
+                foreach (ClientInfoModel CurrClient in InfoModelArray)
+                {
+                    if (CurrClient.ID == CurrentClient.ID)
+                    {
+                        CurrentClient.arc = CurrClient.arc;
+                        CurrentClient.admin = CurrClient.admin;
+                        CurrentClient.macAddress = CurrClient.macAddress;
+                        break;
+                    }
+                }
+                request.addClientInfo(client, CurrentClient); 
+            }
+            ClientInfoModelArray = null;
+
         }
 
         private void btnDeleteUser_Click(object sender, EventArgs e)
@@ -138,9 +189,13 @@ using Server_Client.Classes;
             }
             if (MessageBox.Show("Möchten Sie den ausgewählten Benutzer aus dieser Gruppe löschen? (Dieser wird automatisch in die Gruppe 'Default' verschoben)", "Achtung!", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
+                ClientInfoModel DelClient = new ClientInfoModel();
+                DelClient.ID = Convert.ToInt32( TreeView2.SelectedNode.Tag);
+                request.delClientInfo(client, DelClient);
+
+                DelClient.group = 0;
+                request.addClientInfo(client, DelClient);
                 TreeView2.SelectedNode.Parent.Nodes.Remove(TreeView2.SelectedNode);
-                //Alles Verweise aus DB entfernen
-                //User in Gruppe Default DB
             }
             
         }
@@ -193,21 +248,47 @@ using Server_Client.Classes;
                 }
                 string[] FileArray = new string[FileDialog.FileNames.Length];
                 int counter = 0;
-
+            
+                string archit = "";
                 foreach (string File in FileDialog.FileNames)
                 {
+                    Assembly ExeAssembly = Assembly.LoadFile(File);
+                    System.Reflection.AssemblyName AssemblyAr = new System.Reflection.AssemblyName(ExeAssembly.FullName);
+                    if (archit != "" && archit != AssemblyAr.ProcessorArchitecture.ToString())
+	                {
+                        MessageBox.Show("Die Datei: " + File + " hat das falsche Format(" + AssemblyAr.ProcessorArchitecture.ToString() + "). Bitte erstellen Sie für 32/64 bit Programme einzelne Softwarepakete.");
+                        continue;
+	                }
+                    archit = AssemblyAr.ProcessorArchitecture.ToString();
+
                     FileArray[counter] = File;
                     counter++;
                 }
                 Guid PacketGuid = Guid.NewGuid();
-               
-                if (!Directory.Exists(Server_Client.Properties.Settings.Default.SavePath + "Groups\\" + TreeView1.SelectedNode.Text + "\\"))
+
+                string Path = Server_Client.Properties.Settings.Default.SavePath + "Groups\\" + TreeView1.SelectedNode.Text + "\\";
+                if (!Directory.Exists(Path))
                 {
-                    Directory.CreateDirectory(Server_Client.Properties.Settings.Default.SavePath + "Groups\\" + TreeView1.SelectedNode.Text + "\\");
+                    Directory.CreateDirectory(Path);
                 }
-                clsZipFile.ZipFiles(Server_Client.Properties.Settings.Default.SavePath + "Groups\\" + TreeView1.SelectedNode.Text + "\\" + PacketGuid + ".zip", FileArray, System.IO.Packaging.CompressionOption.Normal);
-                NewListMainItem.Expand();    
+                clsZipFile.ZipFiles(Path + PacketGuid + ".zip", FileArray, System.IO.Packaging.CompressionOption.Normal);
+                NewListMainItem.Expand();
+
+                Assembly assembly = Assembly.LoadFile(Path + PacketGuid + ".zip");
+                System.Reflection.AssemblyName AssemblyName = new System.Reflection.AssemblyName(assembly.FullName);
+                FileInfo fileinfo_ = new FileInfo(Path + PacketGuid + ".zip");
+                    
+                PackageInfoModel CurrentPackage = new PackageInfoModel();
+                CurrentPackage.showName = NewListMainItem.Text;
+                CurrentPackage.Name =  PacketGuid.ToString();
+                CurrentPackage.arc = archit;
+                CurrentPackage.size  =Convert.ToInt32( fileinfo_.Length / 1000000) ;
+                CurrentPackage.Group = Convert.ToInt32( TreeView1.SelectedNode.Tag);
+
+                request.addPackageInfo(client, CurrentPackage);
             }
+
+           
         //Füge Kopie der Datei hinzu und unten entfernen und client gui trayicon
                 
                     //In Datenbank für diese Gruppe anlegen falls nicht exitstiert
@@ -242,7 +323,8 @@ using Server_Client.Classes;
                 for (int i = 0; i < FileDialog.FileNames.Length; i++)
 			{
                     Guid PacketGuid = Guid.NewGuid();
-                    System.IO.File.Copy(FileDialog.FileNames[i], Server_Client.Properties.Settings.Default.SavePath + "Groups\\" + TreeView1.SelectedNode.Text + "\\" + PacketGuid);
+                    string Path = Server_Client.Properties.Settings.Default.SavePath + "Groups\\" + TreeView1.SelectedNode.Text + "\\" + PacketGuid + ".zip";
+                    System.IO.File.Copy(FileDialog.FileNames[i], Path);
 
                     frmNewName NewName = new frmNewName();
                     NewName.ShowDialog();
@@ -272,8 +354,27 @@ using Server_Client.Classes;
                        NewPacketNode.Nodes.Add(oDir.Name);
                        System.IO.File.Delete(oDir.FullName);
                    }
-               
-                         NewPacketNode.Expand();
+
+                   System.IO.File.Copy(FileDialog.FileNames[i].ToString(), Server_Client.Properties.Settings.Default.SavePath + "Groups\\" + TreeView1.SelectedNode.Text + "\\" + NewPacketNode.Text);
+                   string CurrentName = FileDialog.SafeFileName[i].ToString().Replace(".zip", "");
+
+                 List<PackageInfoModel> AllPackages = request.getDatabasePackages(client);
+                 PackageInfoModel CurrentPackage = new PackageInfoModel();
+                 CurrentPackage.Name = PacketGuid.ToString();
+                 CurrentPackage.Group = Convert.ToInt32(TreeView1.SelectedNode.Tag);
+
+                    foreach (PackageInfoModel Package in AllPackages)
+                 {
+                     if (Package.Name == CurrentName)
+                     {
+                         CurrentPackage.showName = Package.showName;
+                         CurrentPackage.arc = Package.arc;
+                         CurrentPackage.size = Package.size;
+                         break;
+                     } 
+                 }
+                    request.addPackageInfo(client, CurrentPackage);
+                    NewPacketNode.Expand();
 			}
 
                
@@ -291,35 +392,61 @@ using Server_Client.Classes;
             }
             if (MessageBox.Show("Möchten Sie das ausgewählte Programm/Paket aus der gewählten Gruppe löschen?", "Achtung!", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
+                PackageInfoModel CurrentPackage = new PackageInfoModel();
+                CurrentPackage.ID = Convert.ToInt32( TreeView3.SelectedNode.Tag);
+                request.delPackageInfo(client, CurrentPackage);
                 TreeView3.SelectedNode.Parent.Nodes.Remove(TreeView3.SelectedNode);
-                //ID's aus Gruppen entfernen & Programme/ZpDatei mit Unterprogrammen aus Ordnern löschen
-                //Alles Verweise aus DB entfernen
             }
         }
 
-
-        private void btnTransmit_Click(object sender, EventArgs e)
-        {
-            //Prüfe wem welches Packet bei welchem Client fehlt ´fehlende senden
-        }
-
-
+               
         private void TreeView1_BeforeExpand()
         {
+            TreeView2.Nodes[0].Nodes.Clear();
+            TreeView3.Nodes[0].Nodes.Clear();
+
+            TreeView3.Nodes[0].Text = "Pakete";
+            TreeView3.Nodes[0].ForeColor = System.Drawing.Color.Black;
+           
+            List<ClientInfoModel> clientList = null;
+            clientList = request.getDatabaseClients(client);
+
+            List<PackageInfoModel> softwareList = null;
+            GroupInfoModel CurrentGroup = new GroupInfoModel();
+            CurrentGroup.ID = Convert.ToInt32( TreeView1.SelectedNode.Tag);
+            softwareList = request.getGroupPackages(client, CurrentGroup);
+
+            foreach (ClientInfoModel Client in clientList)
+            {
+                TreeNode CurrentNode = new TreeNode(Client.PcName);
+                CurrentNode.Tag = Client.ID;
+                TreeView2.Nodes[0].Nodes.Add(CurrentNode);
+            }
+            foreach (PackageInfoModel Package in softwareList)
+            {
+                TreeNode CurrentNode = new TreeNode(Package.showName);
+                CurrentNode.Tag = Package.ID;
+                TreeView3.Nodes[0].Nodes.Add(CurrentNode);
+            }
             //Lade alle Benutzer und Software der Gruppe
         }
 
         private void TreeView2_BeforeExpand()
         {
-            //Zeige alle zum Client gehörigen Programme an(bei Anmeldung angezeigte Software > fehlt Software dann mit gelben Rufzeigen rechts anzeigen (könnte auch zuviel Software installiert sein)
-        }
+            TreeView3.Nodes[0].Nodes.Clear();
 
-        private void TreeView3_NodeMouseClick(System.Object sender, System.Windows.Forms.TreeNodeMouseClickEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
+            List<PackageInfoModel> softwareList = null;
+            ClientInfoModel CurrentClient = new ClientInfoModel();
+            CurrentClient.ID = Convert.ToInt32(TreeView2.SelectedNode.Tag);
+            softwareList = request.getClientPackages(client, CurrentClient);
+
+            foreach (PackageInfoModel Package in softwareList)
             {
-                //If Node hat SoftwareCode dann zeige Contextmenü mit sende Programm
-                //Ist node ein Paket, dann sende ganzes paket
+                TreeNode CurrentNode = new TreeNode(Package.showName);
+                CurrentNode.Tag = Package.ID;
+                TreeView3.Nodes[0].Nodes.Add(CurrentNode);
+                TreeView3.Nodes[0].Text = TreeView3.Nodes[0].Text + " (Clientsoftware)";
+                TreeView3.Nodes[0].ForeColor = System.Drawing.Color.Red;
             }
         }
 
@@ -334,6 +461,83 @@ using Server_Client.Classes;
             this.TopMost = true;
             this.TopMost = false;
         }
+
+
+        private string GetMacAddress()
+        {
+            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
+            //for each j you can get the MAC
+            PhysicalAddress address = nics[0].GetPhysicalAddress();
+            StringBuilder strb = new StringBuilder();
+            for (int e = 0; e < nics.Length; e++)
+            {
+                byte[] bytes = address.GetAddressBytes();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    // Display the physical address in hexadecimal.
+                    strb.AppendLine(bytes[i].ToString("X2"));
+                    // Insert a hyphen after each byte, unless we are at the end of the
+                    // address.
+                    if (i != bytes.Length - 1)
+                    {
+                        strb.AppendLine("-");
+                    }
+                }
+            }
+
+            return strb.ToString();
+        }
+
+        private bool GetAdminBool()
+        {
+            bool isAdmin;
+            try
+            {
+                //get the currently logged in user
+                WindowsIdentity user = WindowsIdentity.GetCurrent();
+                WindowsPrincipal principal = new WindowsPrincipal(user);
+                isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                isAdmin = false;
+            }
+            catch (Exception)
+            {
+                isAdmin = false;
+            }
+            return isAdmin;
+        }
+
+        private string GetArchitecture()
+        {
+
+            string architecture = System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
+            string archWOW = System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432");
+            if (archWOW != null && archWOW != "" && archWOW.Contains("64"))
+                return "x64";
+            if (architecture.Contains("86"))
+                return "x86";
+            if (architecture.Contains("64"))
+                return "x64";
+
+            if (architecture == null)
+            {
+                architecture = "";
+            }
+            else if (architecture == "")
+            {
+                architecture = "Not Defined";
+            }
+            return architecture;
+        }
+
+        private void ServerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+         frmSettings settings = new frmSettings();
+         settings.ShowDialog();
+        }
+
 
     } 
 

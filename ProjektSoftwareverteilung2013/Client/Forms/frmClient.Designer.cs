@@ -33,8 +33,10 @@
             this.icoSoftwareVerteilung = new System.Windows.Forms.NotifyIcon(this.components);
             this.IconContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.einstellungenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.schließenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.beendenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.UpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.IconContextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -50,33 +52,48 @@
             // 
             this.IconContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.einstellungenToolStripMenuItem,
+            this.schließenToolStripMenuItem,
             this.toolStripMenuItem1,
-            this.schließenToolStripMenuItem});
+            this.beendenToolStripMenuItem});
             this.IconContextMenuStrip.Name = "IconContextMenuStrip";
-            this.IconContextMenuStrip.Size = new System.Drawing.Size(149, 54);
+            this.IconContextMenuStrip.Size = new System.Drawing.Size(146, 76);
             // 
             // einstellungenToolStripMenuItem
             // 
             this.einstellungenToolStripMenuItem.Name = "einstellungenToolStripMenuItem";
-            this.einstellungenToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.einstellungenToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.einstellungenToolStripMenuItem.Text = "Einstellungen";
-            // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(145, 6);
+            this.einstellungenToolStripMenuItem.Click += new System.EventHandler(this.einstellungenToolStripMenuItem_Click);
             // 
             // schließenToolStripMenuItem
             // 
             this.schließenToolStripMenuItem.Name = "schließenToolStripMenuItem";
-            this.schließenToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.schließenToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.schließenToolStripMenuItem.Text = "Schließen";
+            this.schließenToolStripMenuItem.Click += new System.EventHandler(this.schließenToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(142, 6);
+            // 
+            // beendenToolStripMenuItem
+            // 
+            this.beendenToolStripMenuItem.Name = "beendenToolStripMenuItem";
+            this.beendenToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.beendenToolStripMenuItem.Text = "Beenden";
+            this.beendenToolStripMenuItem.Click += new System.EventHandler(this.beendenToolStripMenuItem_Click);
+            // 
+            // UpdateTimer
+            // 
+            this.UpdateTimer.Interval = 10;
+            this.UpdateTimer.Tick += new System.EventHandler(this.TimerTick);
             // 
             // frmClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(115, 0);
+            this.ClientSize = new System.Drawing.Size(205, 0);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmClient";
             this.ShowInTaskbar = false;
@@ -92,8 +109,10 @@
         private System.Windows.Forms.NotifyIcon icoSoftwareVerteilung;
         private System.Windows.Forms.ContextMenuStrip IconContextMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem einstellungenToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem schließenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem beendenToolStripMenuItem;
+        private System.Windows.Forms.Timer UpdateTimer;
     }
 }
 

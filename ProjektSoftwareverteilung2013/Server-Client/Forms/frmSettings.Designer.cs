@@ -36,8 +36,7 @@
             this.txtSavePath = new System.Windows.Forms.TextBox();
             this.lblSaveFolder = new System.Windows.Forms.Label();
             this.btnChangeSavePath = new System.Windows.Forms.Button();
-            this.shapeContainer1 = new Microsoft.VisualBasic.PowerPacks.ShapeContainer();
-            this.lineShape1 = new Microsoft.VisualBasic.PowerPacks.LineShape();
+            this.LineShape = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // btnSave
@@ -103,30 +102,21 @@
             this.btnChangeSavePath.UseVisualStyleBackColor = true;
             this.btnChangeSavePath.Click += new System.EventHandler(this.btnChangeSavePath_Click);
             // 
-            // shapeContainer1
+            // LineShape
             // 
-            this.shapeContainer1.Location = new System.Drawing.Point(0, 0);
-            this.shapeContainer1.Margin = new System.Windows.Forms.Padding(0);
-            this.shapeContainer1.Name = "shapeContainer1";
-            this.shapeContainer1.Shapes.AddRange(new Microsoft.VisualBasic.PowerPacks.Shape[] {
-            this.lineShape1});
-            this.shapeContainer1.Size = new System.Drawing.Size(441, 130);
-            this.shapeContainer1.TabIndex = 7;
-            this.shapeContainer1.TabStop = false;
-            // 
-            // lineShape1
-            // 
-            this.lineShape1.Name = "lineShape1";
-            this.lineShape1.X1 = 7;
-            this.lineShape1.X2 = 431;
-            this.lineShape1.Y1 = 93;
-            this.lineShape1.Y2 = 93;
+            this.LineShape.BackColor = System.Drawing.SystemColors.InfoText;
+            this.LineShape.Location = new System.Drawing.Point(7, 93);
+            this.LineShape.Name = "LineShape";
+            this.LineShape.Size = new System.Drawing.Size(422, 1);
+            this.LineShape.TabIndex = 7;
+            this.LineShape.Text = "";
             // 
             // frmSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(441, 130);
+            this.Controls.Add(this.LineShape);
             this.Controls.Add(this.btnChangeSavePath);
             this.Controls.Add(this.txtSavePath);
             this.Controls.Add(this.lblSaveFolder);
@@ -134,7 +124,6 @@
             this.Controls.Add(this.txtServerIP);
             this.Controls.Add(this.lblServerIP);
             this.Controls.Add(this.btnSave);
-            this.Controls.Add(this.shapeContainer1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmSettings";
@@ -153,7 +142,7 @@
         private System.Windows.Forms.TextBox txtSavePath;
         private System.Windows.Forms.Label lblSaveFolder;
         private System.Windows.Forms.Button btnChangeSavePath;
-        private Microsoft.VisualBasic.PowerPacks.ShapeContainer shapeContainer1;
-        private Microsoft.VisualBasic.PowerPacks.LineShape lineShape1;
+        private System.Windows.Forms.RichTextBox LineShape;
+
     }
 }

@@ -19,19 +19,18 @@ namespace Client
         {
             InitializeComponent();
             //ConnectToServer();
+            UpdateTimer.Start();
         }
-
-
-
+        
         private void ConnectToServer()
         {
             ClientInfoModel InfoModel = new ClientInfoModel();
             InfoModel.arc = GetArchitecture();
             InfoModel.macAddress = GetMacAddress();
             InfoModel.admin = GetAdminBool();
-            
-            Connection Connection_ = new Connection(Properties.Settings.Default.ServerIP, InfoModel);
-            //
+
+            sendRequest Request = new sendRequest(Properties.Settings.Default.ServerIP);
+            Request.sendUpdateRequest(InfoModel, Properties.Settings.Default.SavePath);
         }
 
         private string GetMacAddress()
@@ -102,6 +101,32 @@ namespace Client
 	        }
             return architecture;
             }
+
+        private void schließenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            IconContextMenuStrip.Close();
+        }
+
+        private void einstellungenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Forms.frmSetting Settings = new Forms.frmSetting();
+            Settings.ShowDialog();
+        }
+
+        private void beendenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void TimerTick(object sender, EventArgs e)
+        {
+            string CurrentTime = DateTime.Now.TimeOfDay.ToString().Substring(0, 5);
+            string Compare = Properties.Settings.Default.RequestTime;
+            if (CurrentTime == Compare)
+            {
+                ConnectToServer();
+            }
+        }
 
     }
 }
