@@ -74,6 +74,7 @@ namespace ProjektSoftwareverteilung2013.Controller
 
         public ServerThread(TcpClient connection)
         {
+            LocalDB dataBase = null;
             tcpConnection = connection;
             connectionStream = tcpConnection.GetStream();
 
@@ -95,6 +96,21 @@ namespace ProjektSoftwareverteilung2013.Controller
             StandardResultModel result = getResult(request);
 
             sendStringStream(result);
+
+            if (result.type == ResultType.sendPackage)
+            {
+                List<PackageInfoModel> packageList = (List<PackageInfoModel>)result.result;
+                GroupInfoModel group = null;
+                dataBase = new LocalDB();
+
+                if (packageList.Count != 0)
+                {
+                    for (int i = 0; i < packageList.Count; i++)
+                    {
+                        sendFile(group, packageList[i]);
+                    }
+                }
+            }
 
         }
 
@@ -203,40 +219,159 @@ namespace ProjektSoftwareverteilung2013.Controller
         private StandardResultModel getResult(StandardRequestModel request)
         {
             StandardResultModel result = new StandardResultModel();
+            List<ClientInfoModel> clientList = null;
+            List<GroupInfoModel> groupList = null;
+            List<PackageInfoModel> packageList = null;
+
+            ClientInfoModel client = null;
+            GroupInfoModel group = null;
+            PackageInfoModel package = null;
+
             LocalDB dataBase = new LocalDB();
             bool success = false;
             result.successful = success;
 
             switch (request.request)
             {
-                case RequestTyp.upDateRequest:                
+                case RequestTyp.upDateRequest:
+
+                    packageList = dataBase.CheckSoftwareClient(request.Client);
+                    result.successful = true;
+                    if (packageList.Count == 0)
+                    {
+                        result.type = ResultType.defaultInfo;
+                    }
+                    else
+                    {
+                        result.type = ResultType.sendPackage;
+
+                    }
+
+                    result.result = packageList;
                     break;
+
                 case RequestTyp.getDatabaseGroups:
+
+                    groupList = dataBase.Converter.GetGroupInfoModels();
+
+                    result.message = "";
+                    result.result = groupList;
+                    result.successful = true;
+                    result.type = ResultType.GroupInfo;
                     break;
+
                 case RequestTyp.getDatabaseClients:
+
+                    clientList = dataBase.Converter.GetClientInfoModels();
+
+                    result.message = "";
+                    result.result = clientList;
+                    result.successful = true;
+                    result.type = ResultType.ClientInfo;
                     break;
+
                 case RequestTyp.getDatabaseSoftwarePackages:
+
+                    packageList = dataBase.Converter.GetPackageInfoModels();
+
+                    result.message = "";
+                    result.result = packageList;
+                    result.successful = true;
+                    result.type = ResultType.SoftwarePackagesInfo;
                     break;
+
                 case RequestTyp.getGroupClients:
+
+                    //clientList = dataBase;
+
+                    result.message = "";
+                    result.result = clientList;
+                    result.successful = true;
+                    result.type = ResultType.GroupClients;
                     break;
+
                 case RequestTyp.getGrupePackages:
+
+                    //packageList = dataBase
+
+                    result.message = "";
+                    result.result = packageList;
+                    result.successful = true;
+                    result.type = ResultType.GrupePackages;
                     break;
+
                 case RequestTyp.getClientPackages:
+
+                    //packageList = dataBase
+
+                    result.message = "";
+                    result.result = packageList;
+                    result.successful = true;
+                    result.type = ResultType.ClientPackages;
                     break;
+
                 case RequestTyp.addDatabaseClient:
+
+                    client = dataBase.gbAddClient((ClientInfoModel)request.requestData);
+
+                    result.message = "";
+                    result.result = client;
+                    result.successful = true;
+                    result.type = ResultType.addClient;
                     break;
                 case RequestTyp.addDatabaseGroup:
+
+                    group = dataBase.gbAddGroup((GroupInfoModel)request.requestData);
+
+                    result.message = "";
+                    result.result = group;
+                    result.successful = true;
+                    result.type = ResultType.addGroup;
                     break;
+
                 case RequestTyp.addDatabaseSoftwarePackage:
+
+                    package = dataBase.gbAddPackage((PackageInfoModel)request.requestData);
+
+                    result.message = "";
+                    result.result = package;
+                    result.successful = true;
+                    result.type = ResultType.addPackage;
                     break;
+
                 case RequestTyp.delDatabaeClient:
+
+                    result.successful = dataBase.gbDeleteClient((ClientInfoModel)request.requestData);
+
+                    result.message = "";
+                    result.result = package;
+                    result.type = ResultType.delDatabaeClient;
                     break;
+
                 case RequestTyp.delDatabaseGroup:
+
+                    result.successful = dataBase.gbDeleteGroup((GroupInfoModel)request.requestData);
+
+                    result.message = "";
+                    result.result = package;
+                    result.type = ResultType.delDatabaseGroup;
                     break;
                 case RequestTyp.delDatabaseSoftwarePackage:
+
+                    result.successful = dataBase.gbDeletePackage((PackageInfoModel)request.requestData);
+
+                    result.message = "";
+                    result.result = package;
+                    result.type = ResultType.delDatabaseSoftwarePackage;
                     break;
                 case RequestTyp.sendSoftwarePackage:
+
+                    result.message = "";
+                    result.successful = true;
+                    result.type = ResultType.defaultInfo;
+                    result.result = null;
                     break;
+
                 default:
                     break;
             }
