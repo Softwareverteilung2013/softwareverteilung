@@ -7,20 +7,19 @@ using System.IO;
 using System.Data.SqlServerCe;
 using ProjektSoftwareverteilung2013.Controller;
 using ProjektSoftwareverteilung2013.Models;
+using ProjektSoftwareverteilung2013.Datenbanken;
 
 namespace ProjektSoftwareverteilung2013.Controller
 {
     class DataConverter
     {
-        public SqlCeConnection Connection { get; set; }
+        private SqlCeConnection Connection = null;
 
         public DataConverter()
         {
-            string dbfile = Directory.GetCurrentDirectory().ToString();
-            dbfile = dbfile.Substring(0, dbfile.Length - 9);
-            dbfile += "Datenbanken\\SoftwareDB.sdf";
+            LocalDB oDB = new LocalDB();
 
-            Connection = new SqlCeConnection("Datasource=" + dbfile);
+            this.Connection = oDB.Connection;
         }
 
         public List<ClientInfoModel> GetClientInfoModels()
@@ -64,7 +63,6 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                     oGroup.ID = Convert.ToInt32(oRow["Gruppe_ID"]);
                     oGroup.Name = oRow["Gruppe_Name"].ToString();
-                    oGroup.PackageID = Convert.ToInt32(oRow["Gruppe_Softwarepaket_ID"]);
 
                     oResult.Add(oGroup);
                 }
@@ -90,67 +88,13 @@ namespace ProjektSoftwareverteilung2013.Controller
                     oPackage.ID = Convert.ToInt32(oRow["Softwarepaket_ID"]);
                     oPackage.Name = oRow["Softwarepaket_Name"].ToString();
                     oPackage.size = Convert.ToInt32(oRow["Softwarepaket_Groesse"]);
-                    oPackage.arc = oRow["Software_Arc"].ToString();
+                    oPackage.arc = oRow["Softwarepaket_Arc"].ToString();
 
                     oResult.Add(oPackage);
                 }
             }
             
             return oResult;
-        }
-
-        public bool gbInsertGroup(GroupInfoModel oGroup)
-        {
-            try
-            {
-                string sQry;
-                SqlCeCommand SQLCmd = new SqlCeCommand();
-
-                sQry = "INSERT INTO Gruppe(Gruppe_Name, Softwarepaket_ID)" +
-                       "VALUES ('" + oGroup.Name + "', " + oGroup.PackageID + ")";
-
-                SQLCmd.CommandText = sQry;
-                SQLCmd.Connection = Connection;
-                SQLCmd.Connection.Open();
-                SQLCmd.ExecuteNonQuery();
-                SQLCmd.Connection.Close();
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.WriteToEventLog(ex.Message, System.Diagnostics.EventLogEntryType.Error, 3103);
-                return false;
-            }
-        }
-
-        public bool gbInsertClient(ClientInfoModel oClient)
-        {
-            try
-            {
-                string sQry;
-                SqlCeCommand SQLCmd = new SqlCeCommand();
-                int nAdministrator;
-
-                if (oClient.admin) nAdministrator = -1;
-                else nAdministrator = 0;
-
-                sQry = "INSERT INTO Client(Client_MacAdresse, Client_Gruppe, Client_Administrator, Client_Arc)" +
-                       "VALUES ('" + oClient.macAddress + "', " + oClient.group + ", " + nAdministrator + ", " + oClient.arc + ")";
-
-                SQLCmd.CommandText = sQry;
-                SQLCmd.Connection = Connection;
-                SQLCmd.Connection.Open();
-                SQLCmd.ExecuteNonQuery();
-                SQLCmd.Connection.Close();
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Diagnostics.WriteToEventLog(ex.Message, System.Diagnostics.EventLogEntryType.Error, 3104);
-                return false;
-            }
         }
     }
 }
