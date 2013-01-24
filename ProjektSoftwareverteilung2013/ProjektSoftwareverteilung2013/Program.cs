@@ -14,13 +14,15 @@ namespace ProjektSoftwareverteilung2013
         static void Main(string[] args)
         {
             //List<ClientInfoModel> olist = new List<ClientInfoModel>();
-            //LocalDB oDB = new LocalDB();
+            LocalDB oDB = new LocalDB();
+            FileController file = new FileController(oDB.Converter.GetGroupInfoModels());
 
             Controller.Diagnostics.EventName = "Softwareverteilung2013";
             Controller.Diagnostics.WriteToEventLog("Server wird gestartet", System.Diagnostics.EventLogEntryType.Information, 1000);
             Console.WriteLine("starting...");
 
             connection = new ServerConnection();
+
 
             String cmd = "";
             while (!cmd.ToLower().Equals("stop"))

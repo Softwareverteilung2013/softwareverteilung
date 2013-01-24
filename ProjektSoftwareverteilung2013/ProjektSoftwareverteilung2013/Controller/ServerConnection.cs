@@ -254,6 +254,7 @@ namespace ProjektSoftwareverteilung2013.Controller
         private StandardResultModel getResult(StandardRequestModel request)
         {
             StandardResultModel result = new StandardResultModel();
+            FileController fileController = new FileController();
             List<ClientInfoModel> clientList = null;
             List<GroupInfoModel> groupList = null;
             List<PackageInfoModel> packageList = null;
@@ -360,7 +361,7 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                     result.message = "";
                     result.result = group;
-                    result.successful = true;
+                    result.successful = fileController.creatGroupOrder(group.Name);
                     result.type = ResultType.addGroup;
                     break;
 
@@ -385,20 +386,26 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 case RequestTyp.delDatabaseGroup:
 
-                    result.successful = dataBase.gbDeleteGroup((GroupInfoModel)request.requestData);
+                    group = (GroupInfoModel)request.requestData;
+                    result.successful = dataBase.gbDeleteGroup(group);
+
+                    fileController.delGroupOrder(group.Name);
 
                     result.message = "";
                     result.result = package;
                     result.type = ResultType.delDatabaseGroup;
                     break;
+
                 case RequestTyp.delDatabaseSoftwarePackage:
 
-                    result.successful = dataBase.gbDeletePackage((PackageInfoModel)request.requestData);
+                    package = (PackageInfoModel)request.requestData;
+                    result.successful = dataBase.gbDeletePackage(package);
 
                     result.message = "";
                     result.result = package;
                     result.type = ResultType.delDatabaseSoftwarePackage;
                     break;
+
                 case RequestTyp.sendSoftwarePackage:
 
                     clientList = dataBase.Converter.GetClientInfoModels();
