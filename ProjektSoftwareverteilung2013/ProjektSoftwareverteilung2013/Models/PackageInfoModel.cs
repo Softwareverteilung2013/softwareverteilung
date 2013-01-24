@@ -12,5 +12,6 @@ namespace ProjektSoftwareverteilung2013.Models
         public string showName { get; set; }
         public int size { get; set; }
         public string arc { get; set; }
+        public int group { get; set; }
     }
 }

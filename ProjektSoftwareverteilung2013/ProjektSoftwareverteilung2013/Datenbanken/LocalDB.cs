@@ -139,7 +139,7 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
             {
                 string sQry;
                 GroupInfoModel oResult = new GroupInfoModel();
-                SqlCeCommand SQLCmd = new SqlCeCommand();
+                SqlCeCommand sqlCmd = new SqlCeCommand();
 
                 if (oGroup.ID == -1)
                 {
@@ -151,10 +151,10 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
                     sQry = "UPDATE Gruppe SET Gruppe_Name = '" + oGroup.Name + "'";
                 }
 
-                SQLCmd.CommandText = sQry;
-                SQLCmd.Connection = Connection;
+                sqlCmd.CommandText = sQry;
+                sqlCmd.Connection = Connection;
                 openConnection();
-                SQLCmd.ExecuteNonQuery();
+                sqlCmd.ExecuteNonQuery();
                 closeConnection();
 
                 // Bearbeiteten Datensatz ermitteln und im objekt speichern
@@ -186,7 +186,7 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
             {
                 string sQry;
                 ClientInfoModel oResult = new ClientInfoModel();
-                SqlCeCommand SQLCmd = new SqlCeCommand();
+                SqlCeCommand sqlCmd = new SqlCeCommand();
                 int nAdministrator;
 
                 if (oClient.admin) nAdministrator = -1;
@@ -198,18 +198,23 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
                            " Client_MacAdresse = '" + oClient.macAddress + "'" +
                            " , Client_Gruppe = " + oClient.group +
                            " , Client_Administrator = " + nAdministrator +
-                           " , Client_Arc = '" + oClient.arc + "'";
+                           " , Client_Arc = '" + oClient.arc +
+                           " , Client_PCName = '" + oClient.pcName + "'";
                 }
                 else
                 {
-                    sQry = "INSERT INTO Client(Client_MacAdresse, Client_Gruppe, Client_Administrator, Client_Arc)" +
-                           "VALUES ('" + oClient.macAddress + "', " + oClient.group + ", " + nAdministrator + ", " + oClient.arc + ")";
+                    sQry = " INSERT INTO Client(Client_MacAdresse " +
+                           " , Client_Gruppe, Client_Administrator " +
+                           " , Client_Arc, Client_PCName)" +
+                           "VALUES ('" + oClient.macAddress + "'" +
+                           ", " + oClient.group + ", " + nAdministrator + 
+                           ", '" + oClient.arc + "', '" + oClient.pcName + "')";
                 }
 
-                SQLCmd.CommandText = sQry;
-                SQLCmd.Connection = Connection;
+                sqlCmd.CommandText = sQry;
+                sqlCmd.Connection = Connection;
                 openConnection();
-                SQLCmd.ExecuteNonQuery();
+                sqlCmd.ExecuteNonQuery();
                 closeConnection();
 
                 sQry = "SELECT * FROM Client WHERE Client_MacAdresse = '" + oClient.macAddress + "'";
@@ -227,6 +232,7 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
                         oResult.arc = oRow["Client_Arc"].ToString();
                         oResult.group = Convert.ToInt32(oRow["Client_Gruppe"]);
                         oResult.macAddress = oRow["Client_MacAdresse"].ToString();
+                        oResult.pcName = oRow["Client_PCName"].ToString();
                     }
                 }
 
@@ -241,13 +247,51 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
 
         public PackageInfoModel gbAddPackage(PackageInfoModel oPackage)
         {
-            // Prüfen ob package schon angelegt ist.
-            // GUID, Klartext, Groesse, arc
             try
             {
                 string sQry;
                 PackageInfoModel oResult = new PackageInfoModel();
-                SqlCeCommand SQLCmd = new SqlCeCommand();
+                SqlCeCommand sqlCmd = new SqlCeCommand();
+
+                if (mbPackageVorhanden(oPackage.Name))
+                {
+                    sQry = " UPDATE Softwarepaket SET " +
+                           " Softwarepaket_Name = '" + oPackage.Name + "'" +
+                           " , Softwarepaket_Groesse = " + oPackage.size +
+                           " , Softwarepaket_Arc = " + oPackage.arc +
+                           " , Softwarepaket_ShowName = '" + oPackage.showName + "'";
+                }
+                else
+                {
+                    sQry = " INSERT INTO Softwarepaket(Softwarepaket_Name, Softwarepaket_Groesse " +
+                           " , Softwarepaket_Arc, Softwarepaket_ShowName) " +
+                           " VALUES('" + oPackage.Name + "', " + oPackage.size + 
+                           " , '" + oPackage.arc + "', '" + oPackage.showName + "')";
+                }
+
+                sqlCmd.CommandText = sQry;
+                sqlCmd.Connection = Connection;
+                openConnection();
+                sqlCmd.ExecuteNonQuery();
+                closeConnection();
+
+                sQry = "SELECT * FROM Softwarepaket WHERE Softwarepaket_Name = '" + oPackage.Name + "'";
+                SqlCeDataAdapter oDataAdapter = new SqlCeDataAdapter(sQry, Connection);
+                DataTable oData = new DataTable();
+
+                oDataAdapter.Fill(oData);
+
+                foreach (DataRow oRow in oData.Rows)
+                {
+                    if (oData.Rows.Count == 1)
+                    {
+                        oPackage.ID = Convert.ToInt32(oRow["Softwarepaket_ID"]);
+                        oPackage.Name = oRow["Softwarepaket_Name"].ToString();
+                        oPackage.size = Convert.ToInt32(oRow["Softwarepaket_Groesse"]);
+                        oPackage.arc = oRow["Softwarepaket_Arc"].ToString();
+                        oPackage.showName = oRow["Softwarepaket_ShowName"].ToString();
+                    }
+                }
 
                 return oResult;
             }
@@ -264,7 +308,8 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
             {
                 string sQry;
 
-                sQry = "DELETE FROM Client WHERE Client_ID = " + oClient.ID;
+                // Wenn Client gelöscht wird, nur auf die Default-Gruppe setzen
+                sQry = "UPDATE Client SET Client_Gruppe = 0 WHERE Client_ID = " + oClient.ID;
 
                 SqlCeCommand sqlCmd = new SqlCeCommand(sQry, Connection);
                 openConnection();
@@ -275,7 +320,7 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
             }
             catch (Exception ex)
             {
-                Diagnostics.WriteToEventLog(ex.Message, System.Diagnostics.EventLogEntryType.Error, 3107);
+                Diagnostics.WriteToEventLog(ex.Message, System.Diagnostics.EventLogEntryType.Error, 3106);
                 return false;
             }
         }
@@ -286,10 +331,17 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
             {
                 string sQry;
 
+                // Gruppe löschen
                 sQry = "DELETE FROM Gruppe WHERE Gruppe_ID = " + oGroup.ID;
 
                 SqlCeCommand sqlCmd = new SqlCeCommand(sQry, Connection);
                 openConnection();
+                sqlCmd.ExecuteNonQuery();
+
+                // Software-Einträge löschen, die mit der Gruppe verknüpft sind 
+                sQry = "DELETE FROM Gruppe_Softwarepaket WHERE Gruppe_ID = " + oGroup.ID;
+
+                sqlCmd = new SqlCeCommand(sQry, Connection);
                 sqlCmd.ExecuteNonQuery();
                 closeConnection();
 
@@ -308,10 +360,17 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
             {
                 string sQry;
 
+                // Softwarepaket löschen
                 sQry = "DELETE FROM Softwarepaket WHERE Softwarepaket_ID = " + oPackage.ID;
 
                 SqlCeCommand sqlCmd = new SqlCeCommand(sQry, Connection);
                 openConnection();
+                sqlCmd.ExecuteNonQuery();
+
+                // Gruppen-Einträge löschen, die mit dem Softwarepaket verknüpft sind
+                sQry = "DELETE FROM Gruppe_Softwarepaket WHERE Softwarepaket_ID = " + oPackage.ID;
+
+                sqlCmd = new SqlCeCommand(sQry, Connection);
                 sqlCmd.ExecuteNonQuery();
                 closeConnection();
 
@@ -319,17 +378,30 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
             }
             catch (Exception ex)
             {
-                Diagnostics.WriteToEventLog(ex.Message, System.Diagnostics.EventLogEntryType.Error, 3107);
+                Diagnostics.WriteToEventLog(ex.Message, System.Diagnostics.EventLogEntryType.Error, 3108);
                 return false;
             }
         }
 
-        private bool mbClientVorhanden(string macadress)
+        private bool mbClientVorhanden(string sMacadress)
         {
             string sQry;
             DataTable oData = new DataTable();
 
-            sQry = "SELECT * FROM Client WHERE Client_MacAdresse = '" + macadress + "'";
+            sQry = "SELECT * FROM Client WHERE Client_MacAdresse = '" + sMacadress + "'";
+            SqlCeDataAdapter oDataAdapter = new SqlCeDataAdapter(sQry, Connection);
+            oDataAdapter.Fill(oData);
+
+            if (oData.Rows.Count > 0) return true;
+            else return false;
+        }
+
+        private bool mbPackageVorhanden(string sGUID)
+        {
+            string sQry;
+            DataTable oData = new DataTable();
+
+            sQry = "SELECT * FROM Softwarepaket WHERE Softwarepaket_Name = '" + sGUID + "'";
             SqlCeDataAdapter oDataAdapter = new SqlCeDataAdapter(sQry, Connection);
             oDataAdapter.Fill(oData);
 
