@@ -20,6 +20,7 @@ namespace SVApi.Models
         delDatabaseGroup,
         delDatabaseSoftwarePackage,
         sendPackage,
+        readPackage,
         defaultInfo,
     };
 

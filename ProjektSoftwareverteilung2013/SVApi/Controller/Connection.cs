@@ -36,10 +36,21 @@ namespace SVApi.Controller
             }
 
             connectionStream = ServerConnection.GetStream();
+
+            if (request == null)
+            {
+                return result;
+            }
             strRequest = JsonConvert.SerializeObject(request);
             sendStringStream(strRequest);
 
             strResult = readStream();
+
+            if (strRequest == "")
+            {
+                return result;
+            }
+
             result = JsonConvert.DeserializeObject<StandardResultModel>(strResult);
 
             return result;
@@ -60,10 +71,19 @@ namespace SVApi.Controller
             {
                 return "";
             }
-            while ((len = connectionStream.Read(readingBytes, 0, readingBytes.Length)) > 0)
+
+            try
             {
-                break;
+                while ((len = connectionStream.Read(readingBytes, 0, readingBytes.Length)) > 0)
+                {
+                    break;
+                }
             }
+            catch (Exception)
+            {
+                return "";
+            }
+            
 
             message = Encoding.ASCII.GetString(readingBytes);
             string newString = message.Trim();
@@ -92,13 +112,21 @@ namespace SVApi.Controller
 
         public bool readFile(string savePath)
         {
+            string filePath = "";
             if (!ServerConnection.Connected)
             {
                 return false;
             }
 
-            string filePath = readFileStream(savePath);
-
+            try
+            {
+                filePath = readFileStream(savePath);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            
             if (!File.Exists(filePath))
             {
                 return false;
@@ -124,7 +152,14 @@ namespace SVApi.Controller
             string fileName = Encoding.ASCII.GetString(file, 4, fileNameLen);
 
             BinaryWriter bWrite = new BinaryWriter(File.Open(receivedPath + fileName, FileMode.Append));
-            bWrite.Write(file, 4 + fileNameLen, receivedBytesLen - 4 - fileNameLen);
+            try
+            {
+                bWrite.Write(file, 4 + fileNameLen, receivedBytesLen - 4 - fileNameLen);
+            }
+            catch (Exception)
+            {
+                return "";
+            }
 
             bWrite.Close();
 

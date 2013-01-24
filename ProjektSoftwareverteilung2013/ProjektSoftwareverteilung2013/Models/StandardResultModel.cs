@@ -20,6 +20,7 @@ namespace ProjektSoftwareverteilung2013.Models
         delDatabaseGroup,
         delDatabaseSoftwarePackage,
         sendPackage,
+        readPackage,
         defaultInfo,
     };
 

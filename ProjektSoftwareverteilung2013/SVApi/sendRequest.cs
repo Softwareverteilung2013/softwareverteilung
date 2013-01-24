@@ -66,7 +66,7 @@ namespace SVApi
 
             resultInfo = mConnection.startConnection(mRequest);
 
-            if (resultInfo.successful && resultInfo.type == ResultType.defaultInfo)
+            if (resultInfo.successful && resultInfo.type == ResultType.readPackage)
             {
                 value = mConnection.sendFile(filePath);
             }

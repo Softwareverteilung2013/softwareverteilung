@@ -105,11 +105,31 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 if (packageList.Count != 0)
                 {
-                    sendFile(group, packageList[0]);
-                    
+                    ClientInfoModel resultClient = (ClientInfoModel)result.result;
+
+                    if (resultClient != null)
+                    {
+                        sendFile(group, packageList[0]);
+                        dataBase.ClientGetSoftware(resultClient, packageList[0]); 
+                    }
                 }
             }
 
+            if (result.type == ResultType.readPackage)
+            {
+                string strInfo =(string)request.requestData;
+                char[] delimiter1 = new char[] { ',' };
+
+                string[] strArray = strInfo.Split(delimiter1, StringSplitOptions.None);
+
+                if (strArray.Length == 2)
+                {
+                    readFile(strArray[0], strArray[1]);
+                }
+                
+            }
+
+            stopConnection();
         }
 
         private StandardRequestModel readStream()
@@ -124,10 +144,20 @@ namespace ProjektSoftwareverteilung2013.Controller
             {
                 return null;
             }
-            while ((len = connectionStream.Read(readingBytes, 0, readingBytes.Length)) > 0)
+
+            try
             {
-                break;
+                while ((len = connectionStream.Read(readingBytes, 0, readingBytes.Length)) > 0)
+                {
+                    break;
+                }
             }
+            catch (Exception ex)
+            {
+
+                Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3000);
+            }
+            
 
             message = Encoding.ASCII.GetString(readingBytes);
             string newString = message.Trim();
@@ -152,29 +182,36 @@ namespace ProjektSoftwareverteilung2013.Controller
             }
             catch (Exception ex)
             {
-                Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3000);
+                Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3001);
             }
 
             //this.stopConnection();
         }
 
-        private void readFile(GroupInfoModel group, PackageInfoModel package)
+        private void readFile(string strGroupName, string strPackageName)
         {
             Socket clientSock = tcpConnection.Client;
             byte[] file = new byte[1024 * 5000];
 
             FileController fileController = new FileController();
-            string receivedPath = fileController.getPathFromFile(group.Name, package.Name);
+            string receivedPath = fileController.getPathFromFile(strGroupName, strPackageName);
 
             int receivedBytesLen = clientSock.Receive(file);
             int fileNameLen = BitConverter.ToInt32(file, 0);
             string fileName = Encoding.ASCII.GetString(file, 4, fileNameLen);
 
             Console.WriteLine("Client:{0} connected & File {1} started received.", clientSock.RemoteEndPoint, fileName);
-
             BinaryWriter bWrite = new BinaryWriter(File.Open(receivedPath + fileName, FileMode.Append));
-            bWrite.Write(file, 4 + fileNameLen, receivedBytesLen - 4 - fileNameLen);
 
+            try
+            {
+                bWrite.Write(file, 4 + fileNameLen, receivedBytesLen - 4 - fileNameLen);
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3002);
+            }
+            
             bWrite.Close();
 
             Console.WriteLine("File: {0} received & saved at path: {1}", fileName, receivedPath);
@@ -207,7 +244,7 @@ namespace ProjektSoftwareverteilung2013.Controller
             }
             catch (Exception ex)
             {
-                Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3000);
+                Diagnostics.WriteToEventLog(ex.Message, EventLogEntryType.Error, 3003);
             }
 
             stopConnection();
@@ -280,7 +317,7 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 case RequestTyp.getGroupClients:
 
-                    //clientList = dataBase;
+                    clientList = dataBase.Converter.GetGroupClients((GroupInfoModel)request.requestData);
 
                     result.message = "";
                     result.result = clientList;
@@ -290,7 +327,7 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 case RequestTyp.getGrupePackages:
 
-                    //packageList = dataBase
+                    packageList = dataBase.Converter.GetGroupPackages((GroupInfoModel)request.requestData);
 
                     result.message = "";
                     result.result = packageList;
@@ -300,7 +337,7 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 case RequestTyp.getClientPackages:
 
-                    //packageList = dataBase
+                    packageList = dataBase.Converter.GetClientPackages((ClientInfoModel)request.requestData);
 
                     result.message = "";
                     result.result = packageList;
@@ -364,10 +401,20 @@ namespace ProjektSoftwareverteilung2013.Controller
                     break;
                 case RequestTyp.sendSoftwarePackage:
 
+                    clientList = dataBase.Converter.GetClientInfoModels();
+
+                    for (int i = 0; i < clientList.Count; i++)
+                    {
+                        if (request.Client.macAddress == clientList[i].macAddress)
+                        {
+                            client = clientList[i];
+                        }
+                    }
+
                     result.message = "";
                     result.successful = true;
-                    result.type = ResultType.defaultInfo;
-                    result.result = null;
+                    result.type = ResultType.readPackage;
+                    result.result = client;
                     break;
 
                 default:
