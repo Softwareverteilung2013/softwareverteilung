@@ -105,10 +105,8 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 if (packageList.Count != 0)
                 {
-                    for (int i = 0; i < packageList.Count; i++)
-                    {
-                        sendFile(group, packageList[i]);
-                    }
+                    sendFile(group, packageList[0]);
+                    
                 }
             }
 
