@@ -209,13 +209,19 @@ namespace ProjektSoftwareverteilung2013.Controller
 
             switch (request.request)
             {
-                case RequestTyp.upDateRequest:
+                case RequestTyp.upDateRequest:                
                     break;
                 case RequestTyp.getDatabaseGroups:
                     break;
                 case RequestTyp.getDatabaseClients:
                     break;
                 case RequestTyp.getDatabaseSoftwarePackages:
+                    break;
+                case RequestTyp.getGroupClients:
+                    break;
+                case RequestTyp.getGrupePackages:
+                    break;
+                case RequestTyp.getClientPackages:
                     break;
                 case RequestTyp.addDatabaseClient:
                     break;

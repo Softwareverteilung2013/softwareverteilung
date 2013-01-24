@@ -165,9 +165,99 @@ namespace SVApi
             return packageInfo;
         }
 
-        public bool addClientInfo(ClientInfoModel client, ClientInfoModel addClient)
+        public List<ClientInfoModel> getGroupClients(ClientInfoModel client, GroupInfoModel group)
         {
-            bool value = false;
+            List<ClientInfoModel> clientInfo = null;
+            StandardResultModel resultInfo = null;
+
+            if (!client.admin)
+            {
+                return clientInfo;
+            }
+
+            mRequest = RequestController.creatGetGroupClients(client,group);
+
+
+            if (mRequest == null)
+            {
+                return clientInfo;
+            }
+
+            resultInfo = mConnection.startConnection(mRequest);
+            mConnection.closeConnection();
+
+            if (resultInfo.successful && resultInfo.type == ResultType.GroupClients)
+            {
+                clientInfo = (List<ClientInfoModel>)resultInfo.result;
+            }
+
+            mRequest = null;
+            return clientInfo;
+        }
+
+        public List<PackageInfoModel> getGroupPackages(ClientInfoModel client, GroupInfoModel group)
+        {
+            List<PackageInfoModel> clientInfo = null;
+            StandardResultModel resultInfo = null;
+
+            if (!client.admin)
+            {
+                return clientInfo;
+            }
+
+            mRequest = RequestController.creatGetGrupePackages(client,group);
+
+
+            if (mRequest == null)
+            {
+                return clientInfo;
+            }
+
+            resultInfo = mConnection.startConnection(mRequest);
+            mConnection.closeConnection();
+
+            if (resultInfo.successful && resultInfo.type == ResultType.GrupePackages)
+            {
+                clientInfo = (List<PackageInfoModel>)resultInfo.result;
+            }
+
+            mRequest = null;
+            return clientInfo;
+        }
+
+        public List<PackageInfoModel> getClientPackages(ClientInfoModel client, ClientInfoModel clientInfo)
+        {
+            List<PackageInfoModel> Info = null;
+            StandardResultModel resultInfo = null;
+
+            if (!client.admin)
+            {
+                return Info;
+            }
+
+            mRequest = RequestController.creatGetClientPackages(client, clientInfo);
+
+
+            if (mRequest == null)
+            {
+                return Info;
+            }
+
+            resultInfo = mConnection.startConnection(mRequest);
+            mConnection.closeConnection();
+
+            if (resultInfo.successful && resultInfo.type == ResultType.GrupePackages)
+            {
+                Info = (List<PackageInfoModel>)resultInfo.result;
+            }
+
+            mRequest = null;
+            return Info;
+        }
+
+        public int addClientInfo(ClientInfoModel client, ClientInfoModel addClient)
+        {
+            int value = -1;
             StandardResultModel resultInfo = null;
 
             if (!client.admin)
@@ -185,18 +275,20 @@ namespace SVApi
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
+            ClientInfoModel resultClient = (ClientInfoModel)resultInfo.result;
+
             if (resultInfo.successful && resultInfo.type == ResultType.addClient)
             {
-                value = true;
+                value = resultClient.ID;
             }
 
             mRequest = null;
             return value;
         }
 
-        public bool addGroupInfo(ClientInfoModel client, GroupInfoModel addGroup)
+        public int addGroupInfo(ClientInfoModel client, GroupInfoModel addGroup)
         {
-            bool value = false;
+            int value = -1;
             StandardResultModel resultInfo = null;
 
             if (!client.admin)
@@ -214,18 +306,20 @@ namespace SVApi
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
+            GroupInfoModel resultGroup = (GroupInfoModel)resultInfo.result;
+
             if (resultInfo.successful && resultInfo.type == ResultType.addGroup)
             {
-                value = true;
+                value = resultGroup.ID;
             }
 
             mRequest = null;
             return value;
         }
 
-        public bool addPackageInfo(ClientInfoModel client, PackageInfoModel addPackage)
+        public int addPackageInfo(ClientInfoModel client, PackageInfoModel addPackage)
         {
-            bool value = false;
+            int value = -1;
             StandardResultModel resultInfo = null;
 
             if (!client.admin)
@@ -243,9 +337,11 @@ namespace SVApi
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
+            PackageInfoModel resultPackage = (PackageInfoModel)resultInfo.result;
+
             if (resultInfo.successful && resultInfo.type == ResultType.addClient)
             {
-                value = true;
+                value = resultPackage.ID;
             }
 
             mRequest = null;

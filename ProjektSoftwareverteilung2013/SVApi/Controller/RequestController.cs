@@ -46,6 +46,34 @@ namespace SVApi.Controller
             return request;
         }
 
+        public static StandardRequestModel creatGetGroupClients(ClientInfoModel client, GroupInfoModel group)
+        {
+            StandardRequestModel request = null;
+            if (client == null)
+            {
+                return request;
+            }
+            request = new StandardRequestModel();
+            request.Client = client;
+            request.request = RequestTyp.getGroupClients;
+            request.requestData = group;
+            return request;
+        }
+
+        public static StandardRequestModel creatGetGrupePackages(ClientInfoModel client, GroupInfoModel group)
+        {
+            StandardRequestModel request = null;
+            if (client == null)
+            {
+                return request;
+            }
+            request = new StandardRequestModel();
+            request.Client = client;
+            request.request = RequestTyp.getGrupePackages;
+            request.requestData = group;
+            return request;
+        }
+
         public static StandardRequestModel creatAddClientRequest(ClientInfoModel client, ClientInfoModel addClient)
         {
             StandardRequestModel request = null;
@@ -157,6 +185,23 @@ namespace SVApi.Controller
             request.Client = client;
             request.request = RequestTyp.upDateRequest;
             request.requestData = null;
+            return request;
+        }
+
+        public static StandardRequestModel creatGetClientPackages(ClientInfoModel client, ClientInfoModel clientInfo)
+        {
+            StandardRequestModel request = null;
+
+            if (client == null || clientInfo == null)
+            {
+                return request;
+            }
+
+            request = new StandardRequestModel();
+            request.Client = client;
+            request.request = RequestTyp.getClientPackages;
+            request.requestData = clientInfo;
+
             return request;
         }
     }

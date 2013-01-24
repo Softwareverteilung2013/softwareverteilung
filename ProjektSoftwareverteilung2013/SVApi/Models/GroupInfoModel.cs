@@ -9,6 +9,5 @@ namespace SVApi.Models
     {
         public int ID { get; set; }
         public string Name { get; set; }
-        public string PackageIDs { get; set; }
     }
 }

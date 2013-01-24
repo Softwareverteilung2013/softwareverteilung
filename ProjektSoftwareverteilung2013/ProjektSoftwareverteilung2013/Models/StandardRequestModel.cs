@@ -9,8 +9,11 @@ namespace ProjektSoftwareverteilung2013.Models
     {
         upDateRequest,
         getDatabaseGroups,
+        getGroupClients,
+        getGrupePackages,
         getDatabaseClients,
         getDatabaseSoftwarePackages,
+        getClientPackages,
         addDatabaseClient,
         addDatabaseGroup,
         addDatabaseSoftwarePackage,
