@@ -253,6 +253,8 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
                 PackageInfoModel oResult = new PackageInfoModel();
                 SqlCeCommand sqlCmd = new SqlCeCommand();
 
+                openConnection();
+
                 if (mbPackageVorhanden(oPackage.Name))
                 {
                     sQry = " UPDATE Softwarepaket SET " +
@@ -260,6 +262,9 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
                            " , Softwarepaket_Groesse = " + oPackage.size +
                            " , Softwarepaket_Arc = " + oPackage.arc +
                            " , Softwarepaket_ShowName = '" + oPackage.showName + "'";
+
+                    sqlCmd = new SqlCeCommand(sQry, Connection);
+                    sqlCmd.ExecuteNonQuery();
                 }
                 else
                 {
@@ -267,12 +272,17 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
                            " , Softwarepaket_Arc, Softwarepaket_ShowName) " +
                            " VALUES('" + oPackage.Name + "', " + oPackage.size + 
                            " , '" + oPackage.arc + "', '" + oPackage.showName + "')";
+
+                    sqlCmd = new SqlCeCommand(sQry, Connection);
+                    sqlCmd.ExecuteNonQuery();
+
+                    sQry = " INSERT INTO Gruppe_Softwarepaket(Softwarepaket_ID, Gruppe_ID)" +
+                           " VALUES(" + oPackage.ID + ", " + oPackage.group + ")";
+
+                    sqlCmd = new SqlCeCommand(sQry, Connection);
+                    sqlCmd.ExecuteNonQuery();
                 }
 
-                sqlCmd.CommandText = sQry;
-                sqlCmd.Connection = Connection;
-                openConnection();
-                sqlCmd.ExecuteNonQuery();
                 closeConnection();
 
                 sQry = "SELECT * FROM Softwarepaket WHERE Softwarepaket_Name = '" + oPackage.Name + "'";
@@ -383,6 +393,31 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
             }
         }
 
+        public bool ClientGetSoftware(ClientInfoModel client, PackageInfoModel installPack)
+        {
+            try
+            {
+                if (!mbAlreadyInstalled(client.ID, installPack.ID))
+                {
+                    string sQry;
+
+                    sQry = "INSERT INTO Client_Softwarepaket(Client_ID, Softwarepaket_ID)" +
+                           " VALUES(" + client.ID + ", " + installPack.ID + ")";
+                    SqlCeCommand sqlCmd = new SqlCeCommand(sQry, Connection);
+                    openConnection();
+                    sqlCmd.ExecuteNonQuery();
+                    closeConnection();
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.WriteToEventLog(ex.Message, System.Diagnostics.EventLogEntryType.Error, 3108);
+                return false;
+            }
+        }
+
         private bool mbClientVorhanden(string sMacadress)
         {
             string sQry;
@@ -402,6 +437,19 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
             DataTable oData = new DataTable();
 
             sQry = "SELECT * FROM Softwarepaket WHERE Softwarepaket_Name = '" + sGUID + "'";
+            SqlCeDataAdapter oDataAdapter = new SqlCeDataAdapter(sQry, Connection);
+            oDataAdapter.Fill(oData);
+
+            if (oData.Rows.Count > 0) return true;
+            else return false;
+        }
+
+        private bool mbAlreadyInstalled(int nClientID, int nPackageID)
+        {
+            string sQry;
+            DataTable oData = new DataTable();
+
+            sQry = "SELECT * FROM Client_Softwarepaket WHERE Client_ID = " + nClientID + " AND Softwarepaket_ID = " + nPackageID ;
             SqlCeDataAdapter oDataAdapter = new SqlCeDataAdapter(sQry, Connection);
             oDataAdapter.Fill(oData);
 

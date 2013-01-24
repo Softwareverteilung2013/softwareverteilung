@@ -166,11 +166,102 @@ namespace ProjektSoftwareverteilung2013.Controller
                 DataTable oData = new DataTable();
                 string sQry;
 
+                sQry = "    SELECT S.Softwarepaket_ID, S.Softwarepaket_Name " +
+                       "           , S.Softwarepaket_Groesse, S.Softwarepaket_Arc " +
+                       "           , S.Softwarepaket_ShowName " +
+                       "      FROM Softwarepakete AS S" +
+                       " LEFT JOIN Gruppe_Softwarepaket AS GS " +
+                       "     WHERE GS.Gruppe_ID = " + oGroup.ID;
+                SqlCeDataAdapter oDataAdapter = new SqlCeDataAdapter(sQry, Connection);
+                oDataAdapter.Fill(oData);
+
+                foreach (DataRow oRow in oData.Rows)
+                {
+                    PackageInfoModel package = new PackageInfoModel();
+
+                    package.ID = Convert.ToInt32(oRow["Softwarepaket_ID"]);
+                    package.Name = oRow["Softwarepaket_Name"].ToString();
+                    package.size = Convert.ToInt32(oRow["Softwarepaket_Groesse"]);
+                    package.arc = oRow["Softwarepaket_Arc"].ToString();
+                    package.showName = oRow["Softwarepaket_ShowName"].ToString();
+
+                    oResult.Add(package);
+                }
+
                 return oResult;
             }
             catch (Exception ex)
             {
                 Diagnostics.WriteToEventLog(ex.Message, System.Diagnostics.EventLogEntryType.Error, 3015);
+                return null;
+            }
+        }
+
+        public List<PackageInfoModel> GetClientPackages(ClientInfoModel oClient)
+        {
+            try
+            {
+                List<PackageInfoModel> oResult = new List<PackageInfoModel>();
+                DataTable oData = new DataTable();
+                string sQry;
+
+                sQry = "    SELECT SP.Softwarepaket_ID, SP.Softwarepaket_Name " +
+                       "           , SP.Softwarepaket_Groesse, SP.Softwarepaket_Arc " +
+                       "           , SP.Softwarepaket_ShowName " +
+                       "      FROM Client_Softwarepaket AS CP " +
+                       " LEFT JOIN Softwarepaket AS SP ON CP.Softwarepaket_ID = SP.Softwarepaket_ID " +
+                       "     WHERE Client_ID = " + oClient.ID;
+                SqlCeDataAdapter oDataAdapter = new SqlCeDataAdapter(sQry, Connection);
+                oDataAdapter.Fill(oData);
+
+                foreach (DataRow oRow in oData.Rows)
+                {
+                    PackageInfoModel package = new PackageInfoModel();
+
+                    package.ID = Convert.ToInt32(oRow["Softwarepaket_ID"]);
+                    package.Name = oRow["Softwarepaket_Name"].ToString();
+                    package.size = Convert.ToInt32(oRow["Softwarepaket_Groesse"]);
+                    package.arc = oRow["Softwarepaket_Arc"].ToString();
+                    package.showName = oRow["Softwarepaket_ShowName"].ToString();
+
+                    oResult.Add(package);
+                }
+
+                return oResult;
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.WriteToEventLog(ex.Message, System.Diagnostics.EventLogEntryType.Error, 3016);
+                return null;
+            }
+        }
+
+        public GroupInfoModel GetGroupByClient(ClientInfoModel oClient)
+        {
+            try
+            {
+                GroupInfoModel oResult = new GroupInfoModel();
+                DataTable oData = new DataTable();
+                string sQry;
+
+                sQry = "SELECT * FROM Gruppe WHERE Gruppe_ID = " + oClient.group.ToString();
+                SqlCeDataAdapter oDataAdapter = new SqlCeDataAdapter(sQry, Connection);
+
+                oDataAdapter.Fill(oData);
+
+                foreach (DataRow oRow in oData.Rows)
+                {
+                    if (oData.Rows.Count == 1)
+                    {
+                        oResult.ID = Convert.ToInt32(oRow["Gruppe_ID"]);
+                        oResult.Name = oRow["Gruppe_Name"].ToString();
+                    }
+                }
+                return oResult;
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.WriteToEventLog(ex.Message, System.Diagnostics.EventLogEntryType.Error, 3017);
                 return null;
             }
         }
