@@ -66,7 +66,7 @@ namespace SVApi.Controller
             }
 
             message = Encoding.ASCII.GetString(readingBytes);
-            string newString = Regex.Replace(message, "(\\s+)", " ");
+            string newString = message.Trim();
 
             return newString;
         }

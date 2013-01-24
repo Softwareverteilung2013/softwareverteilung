@@ -115,7 +115,7 @@ namespace ProjektSoftwareverteilung2013.Controller
             }
 
             message = Encoding.ASCII.GetString(readingBytes);
-            string newString = Regex.Replace(message, "(\\s+)", " ");
+            string newString = message.Trim();
             Console.WriteLine(newString);
 
             request = JsonConvert.DeserializeObject<StandardRequestModel>(newString);
@@ -235,10 +235,9 @@ namespace ProjektSoftwareverteilung2013.Controller
             return result;
         }
 
-        private bool loginClient(ClientInfoModel client)
+        private void loginClient(ClientInfoModel client)
         {
             Console.WriteLine("Anmeldung Client:" + client.macAddress + " Gruppe:" + client.group + " Admin:" + client.admin);
-            return false;
         }
 
         public void stopConnection()

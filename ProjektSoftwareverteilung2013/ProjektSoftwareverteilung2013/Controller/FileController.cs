@@ -95,5 +95,22 @@ namespace ProjektSoftwareverteilung2013.Controller
             }
             return false;
         }
+
+        public bool delSoftwarePackage(string pathTofile)
+        {
+            if (pathTofile == "")
+            {
+                return false;
+            }
+
+            if (!File.Exists(pathTofile))
+            {
+                return false;
+            }
+
+            File.Delete(pathTofile);
+
+            return false;
+        }
     }
 }
