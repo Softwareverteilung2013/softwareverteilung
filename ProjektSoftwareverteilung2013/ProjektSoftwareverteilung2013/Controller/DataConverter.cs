@@ -137,16 +137,19 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 foreach (DataRow oRow in oData.Rows)
                 {
-                    ClientInfoModel client = new ClientInfoModel();
+                    if (!Convert.ToBoolean(oRow["Client_Administrator"]))
+                    {
+                        ClientInfoModel client = new ClientInfoModel();
 
-                    client.ID = Convert.ToInt32(oRow["Client_ID"]);
-                    client.macAddress = oRow["Client_MacAdresse"].ToString();
-                    client.group = Convert.ToInt32(oRow["Client_Gruppe"]);
-                    client.arc = oRow["Client_Arc"].ToString();
-                    client.admin = Convert.ToBoolean(oRow["Client_Administrator"]);
-                    client.pcName = oRow["Client_PCName"].ToString();
+                        client.ID = Convert.ToInt32(oRow["Client_ID"]);
+                        client.macAddress = oRow["Client_MacAdresse"].ToString();
+                        client.group = Convert.ToInt32(oRow["Client_Gruppe"]);
+                        client.arc = oRow["Client_Arc"].ToString();
+                        client.admin = Convert.ToBoolean(oRow["Client_Administrator"]);
+                        client.pcName = oRow["Client_PCName"].ToString();
 
-                    oResult.Add(client);
+                        oResult.Add(client);
+                    }
                 }
 
                 return oResult;
@@ -169,8 +172,8 @@ namespace ProjektSoftwareverteilung2013.Controller
                 sQry = "    SELECT S.Softwarepaket_ID, S.Softwarepaket_Name " +
                        "           , S.Softwarepaket_Groesse, S.Softwarepaket_Arc " +
                        "           , S.Softwarepaket_ShowName " +
-                       "      FROM Softwarepakete AS S" +
-                       " LEFT JOIN Gruppe_Softwarepaket AS GS " +
+                       "      FROM Softwarepaket AS S" +
+                       " LEFT JOIN Gruppe_Softwarepakete AS GS ON S.Softwarepaket_ID = GS.Softwarepaket_ID " +
                        "     WHERE GS.Gruppe_ID = " + oGroup.ID;
                 SqlCeDataAdapter oDataAdapter = new SqlCeDataAdapter(sQry, Connection);
                 oDataAdapter.Fill(oData);

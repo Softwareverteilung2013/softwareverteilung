@@ -198,12 +198,11 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
 
                 if (mbClientVorhanden(oClient.macAddress))
                 {
-                    sQry = " UPDATE Client SET " +
-                           " Client_MacAdresse = '" + oClient.macAddress + "'" +
-                           " , Client_Gruppe = " + oClient.group +
+                    sQry = " UPDATE Client SET Client_Gruppe = " + oClient.group +
                            " , Client_Administrator = " + nAdministrator +
-                           " , Client_Arc = '" + oClient.arc +
-                           " , Client_PCName = '" + oClient.pcName + "'";
+                           " , Client_Arc = '" + oClient.arc + "'" +
+                           " , Client_PCName = '" + oClient.pcName + "'" +
+                           " WHERE Client_ID = " + oClient.ID;
                 }
                 else
                 {
@@ -255,8 +254,6 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
                 PackageInfoModel oResult = new PackageInfoModel();
                 SqlCeCommand sqlCmd = new SqlCeCommand();
 
-                openConnection();
-
                 if (mbPackageVorhanden(oPackage.Name))
                 {
                     sQry = " UPDATE Softwarepaket SET " +
@@ -265,6 +262,7 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
                            " , Softwarepaket_Arc = " + oPackage.arc +
                            " , Softwarepaket_ShowName = '" + oPackage.showName + "'";
 
+                    openConnection();
                     sqlCmd = new SqlCeCommand(sQry, Connection);
                     sqlCmd.ExecuteNonQuery();
                 }
@@ -275,17 +273,11 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
                            " VALUES('" + oPackage.Name + "', " + oPackage.size + 
                            " , '" + oPackage.arc + "', '" + oPackage.showName + "')";
 
+                    openConnection();
                     sqlCmd = new SqlCeCommand(sQry, Connection);
                     sqlCmd.ExecuteNonQuery();
-
-                    sQry = " INSERT INTO Gruppe_Softwarepaket(Softwarepaket_ID, Gruppe_ID)" +
-                           " VALUES(" + oPackage.ID + ", " + oPackage.group + ")";
-
-                    sqlCmd = new SqlCeCommand(sQry, Connection);
-                    sqlCmd.ExecuteNonQuery();
+                    closeConnection();
                 }
-
-                closeConnection();
 
                 sQry = "SELECT * FROM Softwarepaket WHERE Softwarepaket_Name = '" + oPackage.Name + "'";
                 SqlCeDataAdapter oDataAdapter = new SqlCeDataAdapter(sQry, Connection);
@@ -304,6 +296,14 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
                     }
                 }
 
+                sQry = " INSERT INTO Gruppe_Softwarepakete(Softwarepaket_ID, Gruppe_ID)" +
+                           " VALUES(" + oPackage.ID + ", " + oPackage.group + ")";
+
+                sqlCmd = new SqlCeCommand(sQry, Connection);
+                openConnection();
+                sqlCmd.ExecuteNonQuery();
+                closeConnection();
+
                 return oResult;
             }
             catch (Exception ex)
@@ -320,7 +320,7 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
                 string sQry;
                 openConnection();
 
-                if (mbDataExists("Client_Gruppe", "Client_ID = " + oClient.ID))
+                if (mbDataExists("Client", "Client_ID = " + oClient.ID))
                 {
                     // Wenn Client gelöscht wird, nur auf die Default-Gruppe setzen
                     sQry = "UPDATE Client SET Client_Gruppe = 0 WHERE Client_ID = " + oClient.ID;
@@ -345,13 +345,30 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
             {
                 SqlCeCommand sqlCmd = new SqlCeCommand();
                 string sQry;
-                openConnection();
+                
 
                 if (mbDataExists("Gruppe", "Gruppe_ID = " + oGroup.ID))
                 {
+                    // Vorher alle Clients der Gruppe ermitteln und in Standard packen
+                    DataTable oData = new DataTable();
+                    sQry = "SELECT * FROM Client WHERE Client_Gruppe = " + oGroup.ID;
+                    SqlCeDataAdapter oDataAdapter = new SqlCeDataAdapter(sQry, Connection);
+                    oDataAdapter.Fill(oData);
+
+                    foreach (DataRow oRow in oData.Rows)
+                    {
+                        ClientInfoModel clientingroup = new ClientInfoModel();
+                        
+                        clientingroup.ID = Convert.ToInt32(oRow["Client_ID"]);
+
+                        gbDeleteClient(clientingroup);
+                    }
+
                     // Gruppe löschen
+
                     sQry = "DELETE FROM Gruppe WHERE Gruppe_ID = " + oGroup.ID;
                     sqlCmd = new SqlCeCommand(sQry, Connection);
+                    openConnection();
                     sqlCmd.ExecuteNonQuery();
                 }
 
@@ -361,6 +378,7 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
                     sQry = "DELETE FROM Gruppe_Softwarepaket WHERE Gruppe_ID = " + oGroup.ID;
 
                     sqlCmd = new SqlCeCommand(sQry, Connection);
+                    openConnection();
                     sqlCmd.ExecuteNonQuery();
                 }
                 
@@ -381,25 +399,26 @@ namespace ProjektSoftwareverteilung2013.Datenbanken
             {
                 SqlCeCommand sqlCmd = new SqlCeCommand();
                 string sQry;
-                openConnection();
 
                 if (mbDataExists("Softwarepaket", "Softwarepaket_ID = " + oPackage.ID))
                 {
                     // Softwarepaket löschen
                     sQry = "DELETE FROM Softwarepaket WHERE Softwarepaket_ID = " + oPackage.ID;
+                    openConnection();
                     sqlCmd = new SqlCeCommand(sQry, Connection);
                     sqlCmd.ExecuteNonQuery();
+                    closeConnection();
                 }
 
-                if (mbDataExists("Gruppe_Softwarepaket", "Softwarepaket_ID = " + oPackage.ID))
+                if (mbDataExists("Gruppe_Softwarepakete", "Softwarepaket_ID = " + oPackage.ID))
                 {
                     // Gruppen-Einträge löschen, die mit dem Softwarepaket verknüpft sind
-                    sQry = "DELETE FROM Gruppe_Softwarepaket WHERE Softwarepaket_ID = " + oPackage.ID;
+                    sQry = "DELETE FROM Gruppe_Softwarepakete WHERE Softwarepaket_ID = " + oPackage.ID;
+                    openConnection();
                     sqlCmd = new SqlCeCommand(sQry, Connection);
                     sqlCmd.ExecuteNonQuery();
+                    closeConnection();
                 }
-                
-                closeConnection();
 
                 return true;
             }
