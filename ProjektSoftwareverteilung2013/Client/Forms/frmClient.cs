@@ -23,13 +23,13 @@ namespace Client
         {
             InitializeComponent();
 
-            if (Client.Properties.Settings.Default.ServerIP == "")
+            if (Client.Properties.Settings.Default.ServerIP == "0")
             {
                 MessageBox.Show("Bitte geben Sie die IP des Servers an.");
 
                 frmSetting settings = new frmSetting();
                 settings.ShowDialog();
-                if (Client.Properties.Settings.Default.ServerIP == "")
+                if (Client.Properties.Settings.Default.ServerIP == "0")
                 {
                     MessageBox.Show("Sie haben keine IP für den Servers angegeben. Das Programm wird beendet.");
                     this.Close();

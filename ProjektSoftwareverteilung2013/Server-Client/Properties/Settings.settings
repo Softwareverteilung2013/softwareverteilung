@@ -6,7 +6,7 @@
       <Value Profile="(Default)">C:\Datenbank\Softwareverteilung</Value>
     </Setting>
     <Setting Name="ServerIP" Type="System.String" Scope="User">
-      <Value Profile="(Default)">169.254.105.97</Value>
+      <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

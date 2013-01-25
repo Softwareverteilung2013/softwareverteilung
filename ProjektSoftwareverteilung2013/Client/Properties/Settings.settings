@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="ServerIP" Type="System.String" Scope="User">
-      <Value Profile="(Default)">192.168.123.1</Value>
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="SavePath" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\</Value>

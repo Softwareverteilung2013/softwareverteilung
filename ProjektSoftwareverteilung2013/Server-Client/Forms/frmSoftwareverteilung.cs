@@ -33,13 +33,13 @@ using Server_Client.Forms;
                 Directory.CreateDirectory(Server_Client.Properties.Settings.Default.SavePath + "\\Softwareverteilung");
             }
 
-            if (Server_Client.Properties.Settings.Default.ServerIP == "")
+            if (Server_Client.Properties.Settings.Default.ServerIP == "0")
             {
                 MessageBox.Show("Bitte geben Sie die IP des Servers an.");
 
                frmSettings settings = new frmSettings();
                 settings.ShowDialog();
-                if (Server_Client.Properties.Settings.Default.ServerIP == "")
+                if (Server_Client.Properties.Settings.Default.ServerIP == "0")
                 {
                     MessageBox.Show("Sie haben keine IP für den Servers angegeben. Das Programm wird beendet.");
                     this.Close();
@@ -508,7 +508,7 @@ using Server_Client.Forms;
         icoSoftwareverteilung.Visible = false;
         }
 
-        private void TreeView1_BeforeExpand()
+        private void TreeView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             TreeView2.Nodes[0].Nodes.Clear();
             TreeView3.Nodes[0].Nodes.Clear();
@@ -539,7 +539,7 @@ using Server_Client.Forms;
             //Lade alle Benutzer und Software der Gruppe
         }
 
-        private void TreeView2_BeforeExpand()
+        private void TreeView2_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             TreeView3.Nodes[0].Nodes.Clear();
 
@@ -556,6 +556,16 @@ using Server_Client.Forms;
                 TreeView3.Nodes[0].Text = TreeView3.Nodes[0].Text + " (Clientsoftware)";
                 TreeView3.Nodes[0].ForeColor = System.Drawing.Color.Red;
             }
+        }
+
+        private void TreeView1_BeforeExpand()
+        {
+
+        }
+
+        private void TreeView2_BeforeExpand()
+        {
+
         }
 
 

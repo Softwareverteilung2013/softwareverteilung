@@ -37,7 +37,7 @@ namespace Server_Client.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("169.254.105.97")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public string ServerIP {
             get {
                 return ((string)(this["ServerIP"]));

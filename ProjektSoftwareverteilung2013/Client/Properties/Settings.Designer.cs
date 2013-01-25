@@ -25,7 +25,7 @@ namespace Client.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("192.168.123.1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public string ServerIP {
             get {
                 return ((string)(this["ServerIP"]));
