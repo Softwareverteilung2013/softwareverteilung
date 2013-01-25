@@ -23,12 +23,21 @@ namespace ProjektSoftwareverteilung2013
 
             connection = new ServerConnection();
 
-
             String cmd = "";
-            while (!cmd.ToLower().Equals("stop"))
+            while (cmd.ToLower() != "stop")
             {
                 cmd = Console.ReadLine();
-                if (!cmd.ToLower().Equals("stop"))
+                
+                if (cmd.ToLower().Equals("clients"))
+                {
+                    List<ClientInfoModel> oList = oDB.Converter.GetClientInfoModels();
+
+                    for (int i = 0; i < oList.Count; i++)
+                    {
+                        Console.WriteLine(oList[i].pcName.ToString() + "   " + oList[i].group.ToString());
+                    }
+                }
+                else if (!cmd.ToLower().Equals("stop"))
                     Console.WriteLine("Unbekannter Befehl: " + cmd);
             }
 
