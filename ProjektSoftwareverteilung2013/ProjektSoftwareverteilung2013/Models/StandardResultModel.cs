@@ -7,21 +7,21 @@ namespace ProjektSoftwareverteilung2013.Models
 {
     public enum ResultType
     {
-        ClientInfo,
-        GroupInfo,
-        SoftwarePackagesInfo,
-        GroupClients,
-        GrupePackages,
-        ClientPackages,
-        addClient,
-        addGroup,
-        addPackage,
-        delDatabaeClient,
-        delDatabaseGroup,
-        delDatabaseSoftwarePackage,
-        sendPackage,
-        readPackage,
-        defaultInfo,
+        ClientInfo = 0,
+        GroupInfo = 1,
+        SoftwarePackagesInfo = 2,
+        GroupClients = 3,
+        GrupePackages = 4,
+        ClientPackages = 5,
+        addClient = 6,
+        addGroup = 7,
+        addPackage = 8,
+        delDatabaeClient = 9,
+        delDatabaseGroup = 10,
+        delDatabaseSoftwarePackage = 11,
+        sendPackage = 12,
+        readPackage = 13,
+        defaultInfo = 14,
     };
 
     class StandardResultModel

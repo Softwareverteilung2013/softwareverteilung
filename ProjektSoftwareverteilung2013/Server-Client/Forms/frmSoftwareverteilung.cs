@@ -138,7 +138,7 @@ using Server_Client.Forms;
         {
             if ((TreeView1.SelectedNode != null))
             {
-                if (TreeView1.SelectedNode.Text == "Default")
+                if (TreeView1.SelectedNode.Text == "Standard")
                 {
                     return;
                 }
@@ -202,7 +202,7 @@ using Server_Client.Forms;
                 MessageBox.Show("Bitte wählen Sie einen zu löschenden Benutzer aus.");
                 return;
             }
-            if (MessageBox.Show("Möchten Sie den ausgewählten Benutzer aus dieser Gruppe löschen? (Dieser wird automatisch in die Gruppe 'Default' verschoben)", "Achtung!", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (MessageBox.Show("Möchten Sie den ausgewählten Benutzer aus dieser Gruppe löschen? (Dieser wird automatisch in die Gruppe 'Standard' verschoben)", "Achtung!", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 ClientInfoModel DelClient = new ClientInfoModel();
                 DelClient.ID = Convert.ToInt32( TreeView2.SelectedNode.Tag);
@@ -508,7 +508,8 @@ using Server_Client.Forms;
         icoSoftwareverteilung.Visible = false;
         }
 
-        private void TreeView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+  
+        private void TreeView1_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             TreeView2.Nodes[0].Nodes.Clear();
             TreeView3.Nodes[0].Nodes.Clear();
@@ -516,12 +517,13 @@ using Server_Client.Forms;
             TreeView3.Nodes[0].Text = "Pakete";
             TreeView3.Nodes[0].ForeColor = System.Drawing.Color.Black;
 
-            List<ClientInfoModel> clientList = null;
-            clientList = request.getDatabaseClients(client);
-
-            List<PackageInfoModel> softwareList = null;
             GroupInfoModel CurrentGroup = new GroupInfoModel();
             CurrentGroup.ID = Convert.ToInt32(TreeView1.SelectedNode.Tag);
+
+            List<ClientInfoModel> clientList = null;
+            clientList = request.getGroupClients(client, CurrentGroup);
+
+            List<PackageInfoModel> softwareList = null;
             softwareList = request.getGroupPackages(client, CurrentGroup);
 
             foreach (ClientInfoModel Client in clientList)
@@ -536,10 +538,9 @@ using Server_Client.Forms;
                 CurrentNode.Tag = Package.ID;
                 TreeView3.Nodes[0].Nodes.Add(CurrentNode);
             }
-            //Lade alle Benutzer und Software der Gruppe
         }
 
-        private void TreeView2_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        private void TreeView2_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             TreeView3.Nodes[0].Nodes.Clear();
 
@@ -557,17 +558,5 @@ using Server_Client.Forms;
                 TreeView3.Nodes[0].ForeColor = System.Drawing.Color.Red;
             }
         }
-
-        private void TreeView1_BeforeExpand()
-        {
-
-        }
-
-        private void TreeView2_BeforeExpand()
-        {
-
-        }
-
-
     } 
 

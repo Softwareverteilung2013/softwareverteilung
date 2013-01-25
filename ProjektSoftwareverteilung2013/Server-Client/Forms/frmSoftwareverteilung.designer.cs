@@ -29,9 +29,7 @@
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Pakete");
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Clients");
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Default");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Gruppen", new System.Windows.Forms.TreeNode[] {
-            treeNode3});
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Gruppen");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSoftwareverteilung));
             this.ToolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.btnDeleteSoftware = new System.Windows.Forms.Button();
@@ -161,22 +159,20 @@
             this.TreeView2.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode2});
             this.TreeView2.Size = new System.Drawing.Size(162, 342);
-            this.TreeView2.TabIndex = 13;
-            this.TreeView2.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreeView2_BeforeExpand);
+            this.TreeView2.TabIndex = 13;       
+            this.TreeView2.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeView2_NodeMouseClick);
             // 
             // TreeView1
             // 
             this.TreeView1.Location = new System.Drawing.Point(12, 27);
             this.TreeView1.Name = "TreeView1";
-            treeNode3.Name = "Default";
-            treeNode3.Text = "Default";
-            treeNode4.Name = "Groups";
-            treeNode4.Text = "Gruppen";
+            treeNode3.Name = "Groups";
+            treeNode3.Text = "Gruppen";
             this.TreeView1.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode4});
+            treeNode3});
             this.TreeView1.Size = new System.Drawing.Size(163, 342);
             this.TreeView1.TabIndex = 12;
-            this.TreeView1.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreeView1_BeforeExpand);
+            this.TreeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeView1_NodeMouseClick);
             // 
             // MenuStrip
             // 
