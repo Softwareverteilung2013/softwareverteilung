@@ -291,7 +291,7 @@ namespace SVApi
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
-            ClientInfoModel resultClient = (ClientInfoModel)resultInfo.result;
+            ClientInfoModel resultClient = JsonConvert.DeserializeObject<ClientInfoModel>(resultInfo.result.ToString());
 
             if (resultInfo.successful && resultInfo.type == ResultType.addClient)
             {
@@ -322,7 +322,7 @@ namespace SVApi
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
-            GroupInfoModel resultGroup = (GroupInfoModel)resultInfo.result;
+            GroupInfoModel resultGroup = JsonConvert.DeserializeObject<GroupInfoModel>(resultInfo.result.ToString());
 
             if (resultInfo.successful && resultInfo.type == ResultType.addGroup)
             {
@@ -353,7 +353,7 @@ namespace SVApi
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
-            PackageInfoModel resultPackage = (PackageInfoModel)resultInfo.result;
+            PackageInfoModel resultPackage = JsonConvert.DeserializeObject<PackageInfoModel>(resultInfo.result.ToString());
 
             if (resultInfo.successful && resultInfo.type == ResultType.addClient)
             {
