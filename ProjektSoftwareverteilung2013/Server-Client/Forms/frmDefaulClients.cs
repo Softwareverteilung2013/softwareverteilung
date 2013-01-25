@@ -27,7 +27,7 @@ namespace Server_Client.Forms
             {
                 ListViewItem.ListViewSubItem CurrentItem = new ListViewItem.ListViewSubItem();
                 CurrentItem.Tag = Client.ID;
-                CurrentItem.Text = Client.PcName;
+                CurrentItem.Text = Client.pcName;
                 listView1.Items[0].SubItems.Add(CurrentItem);
             }
         }
@@ -45,7 +45,7 @@ namespace Server_Client.Forms
             {
                 ClientInfoModel CurrentModel = new ClientInfoModel();
                 CurrentModel.ID = Convert.ToInt32( Node.Tag);
-                CurrentModel.PcName = Node.Text;
+                CurrentModel.pcName = Node.Text;
                 ClientInfoModelArray.Add(CurrentModel);
             }
          frmSoftwareverteilung.ClientInfoModelArray = ClientInfoModelArray;

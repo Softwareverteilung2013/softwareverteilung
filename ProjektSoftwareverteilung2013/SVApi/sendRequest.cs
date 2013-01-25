@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using SVApi.Controller;
 using SVApi.Models;
+using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SVApi
 {
@@ -99,7 +102,9 @@ namespace SVApi
 
             if (resultInfo.successful && resultInfo.type == ResultType.ClientInfo)
             {
-                clientInfo = (List<ClientInfoModel>)resultInfo.result;
+                clientInfo = new List<ClientInfoModel>();
+                JArray array = (JArray)resultInfo.result;
+                clientInfo = JsonConvert.DeserializeObject<List<ClientInfoModel>>(array.ToString());
             }
 
             mRequest = null;
@@ -110,6 +115,7 @@ namespace SVApi
         {
             List<GroupInfoModel> groupInfo = null;
             StandardResultModel resultInfo = null;
+            
 
             if (!client.admin)
             {
@@ -122,13 +128,15 @@ namespace SVApi
             {
                 return groupInfo;
             }
-
+       
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
             if (resultInfo.successful && resultInfo.type == ResultType.GroupInfo)
             {
-                groupInfo = (List<GroupInfoModel>)resultInfo.result;
+                groupInfo = new List<GroupInfoModel>();
+                 JArray array =(JArray)resultInfo.result;
+                 groupInfo = JsonConvert.DeserializeObject<List<GroupInfoModel>>(array.ToString());
             }
 
             mRequest = null;
@@ -158,7 +166,9 @@ namespace SVApi
 
             if (resultInfo.successful && resultInfo.type == ResultType.SoftwarePackagesInfo)
             {
-                packageInfo = (List<PackageInfoModel>)resultInfo.result;
+                packageInfo = new List<PackageInfoModel>();
+                JArray array = (JArray)resultInfo.result;
+                packageInfo = JsonConvert.DeserializeObject<List<PackageInfoModel>>(array.ToString());
             }
 
             mRequest = null;
@@ -188,7 +198,9 @@ namespace SVApi
 
             if (resultInfo.successful && resultInfo.type == ResultType.GroupClients)
             {
-                clientInfo = (List<ClientInfoModel>)resultInfo.result;
+                clientInfo = new List<ClientInfoModel>();
+                JArray array = (JArray)resultInfo.result;
+                clientInfo = JsonConvert.DeserializeObject<List<ClientInfoModel>>(array.ToString());
             }
 
             mRequest = null;
@@ -197,12 +209,12 @@ namespace SVApi
 
         public List<PackageInfoModel> getGroupPackages(ClientInfoModel client, GroupInfoModel group)
         {
-            List<PackageInfoModel> clientInfo = null;
+            List<PackageInfoModel> packageInfo = null;
             StandardResultModel resultInfo = null;
 
             if (!client.admin)
             {
-                return clientInfo;
+                return packageInfo;
             }
 
             mRequest = RequestController.creatGetGrupePackages(client,group);
@@ -210,7 +222,7 @@ namespace SVApi
 
             if (mRequest == null)
             {
-                return clientInfo;
+                return packageInfo;
             }
 
             resultInfo = mConnection.startConnection(mRequest);
@@ -218,21 +230,23 @@ namespace SVApi
 
             if (resultInfo.successful && resultInfo.type == ResultType.GrupePackages)
             {
-                clientInfo = (List<PackageInfoModel>)resultInfo.result;
+                packageInfo = new List<PackageInfoModel>();
+                JArray array = (JArray)resultInfo.result;
+                packageInfo = JsonConvert.DeserializeObject<List<PackageInfoModel>>(array.ToString());
             }
 
             mRequest = null;
-            return clientInfo;
+            return packageInfo;
         }
 
         public List<PackageInfoModel> getClientPackages(ClientInfoModel client, ClientInfoModel clientInfo)
         {
-            List<PackageInfoModel> Info = null;
+            List<PackageInfoModel> packageInfo = null;
             StandardResultModel resultInfo = null;
 
             if (!client.admin)
             {
-                return Info;
+                return packageInfo;
             }
 
             mRequest = RequestController.creatGetClientPackages(client, clientInfo);
@@ -240,7 +254,7 @@ namespace SVApi
 
             if (mRequest == null)
             {
-                return Info;
+                return packageInfo;
             }
 
             resultInfo = mConnection.startConnection(mRequest);
@@ -248,11 +262,13 @@ namespace SVApi
 
             if (resultInfo.successful && resultInfo.type == ResultType.GrupePackages)
             {
-                Info = (List<PackageInfoModel>)resultInfo.result;
+                packageInfo = new List<PackageInfoModel>();
+                JArray array = (JArray)resultInfo.result;
+                packageInfo = JsonConvert.DeserializeObject<List<PackageInfoModel>>(array.ToString());
             }
 
             mRequest = null;
-            return Info;
+            return packageInfo;
         }
 
         public int addClientInfo(ClientInfoModel client, ClientInfoModel addClient)

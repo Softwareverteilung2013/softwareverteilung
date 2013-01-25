@@ -158,7 +158,7 @@ using Server_Client.Forms;
 
             foreach (ClientInfoModel CurrentClient in ClientInfoModelArray)
             {
-                TreeNode CurrentNode = new TreeNode(CurrentClient.PcName);
+                TreeNode CurrentNode = new TreeNode(CurrentClient.pcName);
                 CurrentNode.Tag = CurrentClient.ID;
                 TreeView2.Nodes[0].Nodes.Add(CurrentNode);
 
@@ -284,7 +284,7 @@ using Server_Client.Forms;
                 CurrentPackage.Name =  PacketGuid.ToString();
                 CurrentPackage.arc = archit;
                 CurrentPackage.size  =Convert.ToInt32( fileinfo_.Length / 1000000) ;
-                CurrentPackage.Group = Convert.ToInt32( TreeView1.SelectedNode.Tag);
+                CurrentPackage.group = Convert.ToInt32( TreeView1.SelectedNode.Tag);
 
                 request.addPackageInfo(client, CurrentPackage);
             }
@@ -362,7 +362,7 @@ using Server_Client.Forms;
                  List<PackageInfoModel> AllPackages = request.getDatabasePackages(client);
                  PackageInfoModel CurrentPackage = new PackageInfoModel();
                  CurrentPackage.Name = PacketGuid.ToString();
-                 CurrentPackage.Group = Convert.ToInt32(TreeView1.SelectedNode.Tag);
+                 CurrentPackage.group = Convert.ToInt32(TreeView1.SelectedNode.Tag);
 
                     foreach (PackageInfoModel Package in AllPackages)
                  {
@@ -420,7 +420,7 @@ using Server_Client.Forms;
 
             foreach (ClientInfoModel Client in clientList)
             {
-                TreeNode CurrentNode = new TreeNode(Client.PcName);
+                TreeNode CurrentNode = new TreeNode(Client.pcName);
                 CurrentNode.Tag = Client.ID;
                 TreeView2.Nodes[0].Nodes.Add(CurrentNode);
             }

@@ -16,11 +16,13 @@ namespace SVApi.Controller
         private TcpClient ServerConnection = null;
         private IPEndPoint ConnectionInformation = null;
         private Stream connectionStream = null;
+        private string IpAddress;
 
         public Connection(string ipAddress)
         {
             int port = 5555;
             IPAddress mIpAddress = IPAddress.Parse(ipAddress);
+            IpAddress = ipAddress;
             ConnectionInformation = new IPEndPoint(mIpAddress,port);
         }
 
@@ -28,7 +30,7 @@ namespace SVApi.Controller
         {
             StandardResultModel result = null;
             string strRequest = null, strResult = null; 
-            ServerConnection = new TcpClient(ConnectionInformation);
+            ServerConnection = new TcpClient(IpAddress,5555);
 
             if (!ServerConnection.Connected)
             {
