@@ -11,6 +11,9 @@ using SVApi.Models;
 using System.Net.NetworkInformation;
 using System.Security.Principal;
 using System.Diagnostics;
+using Client.Forms;
+using System.IO;
+using Client.Classes;
 
 namespace Client
 {
@@ -19,7 +22,21 @@ namespace Client
         public frmClient()
         {
             InitializeComponent();
-            //ConnectToServer();
+
+            if (Client.Properties.Settings.Default.ServerIP == "")
+            {
+                MessageBox.Show("Bitte geben Sie die IP des Servers an.");
+
+                frmSetting settings = new frmSetting();
+                settings.ShowDialog();
+                if (Client.Properties.Settings.Default.ServerIP == "")
+                {
+                    MessageBox.Show("Sie haben keine IP für den Servers angegeben. Das Programm wird beendet.");
+                    this.Close();
+                }
+            }
+
+            ConnectToServer();
             UpdateTimer.Start();
         }
         
@@ -33,21 +50,34 @@ namespace Client
             sendRequest Request = new sendRequest(Properties.Settings.Default.ServerIP);      
             if (Request.sendUpdateRequest(InfoModel, Properties.Settings.Default.SavePath))
             {
-               //Get All Zip Files, Unpack to new underfolder, Move Zip File to Another underfolder, Install Each File in First Underfolder
+                foreach (string file in System.IO.Directory.GetFiles(Properties.Settings.Default.SavePath))
+                {
+                    UnpackZip(file);
+                }
+                InstallProgramms();
             }
         }
 
         private void UnpackZip(string ZipPath)
         {
-
+            if (!Directory.Exists(Properties.Settings.Default.SavePath + "\\UnzippedFiles\\"))
+            {
+                Directory.CreateDirectory(Properties.Settings.Default.SavePath + "\\UnzippedFiles\\");
+            }
+            clsZipFile.Unzip(ZipPath, Properties.Settings.Default.SavePath + "\\UnzippedFiles\\");
         }
 
-        private void InstallProgramms(string ProgPath)
+        private void InstallProgramms()
         {
-            Process CurrentProcess = new Process();
-            CurrentProcess.StartInfo.FileName = ProgPath;
-            CurrentProcess.StartInfo.Arguments = "/i \"" + ProgPath + "\"/qn";
-            CurrentProcess.Start();
+            string[] FileArr = System.IO.Directory.GetFiles(Properties.Settings.Default.SavePath + "\\UnzippedFiles\\");
+
+            for (int i = 0; i < FileArr.Length; i++)
+            {
+                Process CurrentProcess = new Process();
+                CurrentProcess.StartInfo.FileName = FileArr[i];
+                CurrentProcess.StartInfo.Arguments = "/i \"" + FileArr[i] + "\"/qn";
+                CurrentProcess.Start();
+            }
         }
 
         private void DeinstallProgramms(string ProgPath)
@@ -94,7 +124,7 @@ namespace Client
                 WindowsPrincipal principal = new WindowsPrincipal(user);
                 isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
                 isAdmin = false;
             }
