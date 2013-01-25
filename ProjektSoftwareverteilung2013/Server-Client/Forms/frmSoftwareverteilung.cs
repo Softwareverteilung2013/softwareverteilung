@@ -416,57 +416,6 @@ using Server_Client.Forms;
         }
 
 
-        private void TreeView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
-        {
-            TreeView2.Nodes[0].Nodes.Clear();
-            TreeView3.Nodes[0].Nodes.Clear();
-
-            TreeView3.Nodes[0].Text = "Pakete";
-            TreeView3.Nodes[0].ForeColor = System.Drawing.Color.Black;
-           
-            List<ClientInfoModel> clientList = null;
-            clientList = request.getDatabaseClients(client);
-
-            List<PackageInfoModel> softwareList = null;
-            GroupInfoModel CurrentGroup = new GroupInfoModel();
-            CurrentGroup.ID = Convert.ToInt32( TreeView1.SelectedNode.Tag);
-            softwareList = request.getGroupPackages(client, CurrentGroup);
-
-            foreach (ClientInfoModel Client in clientList)
-            {
-                TreeNode CurrentNode = new TreeNode(Client.pcName);
-                CurrentNode.Tag = Client.ID;
-                TreeView2.Nodes[0].Nodes.Add(CurrentNode);
-            }
-            foreach (PackageInfoModel Package in softwareList)
-            {
-                TreeNode CurrentNode = new TreeNode(Package.showName);
-                CurrentNode.Tag = Package.ID;
-                TreeView3.Nodes[0].Nodes.Add(CurrentNode);
-            }
-            //Lade alle Benutzer und Software der Gruppe
-        }
-
-        private void TreeView2_BeforeExpand(object sender, TreeViewCancelEventArgs e)
-        {
-            TreeView3.Nodes[0].Nodes.Clear();
-
-            List<PackageInfoModel> softwareList = null;
-            ClientInfoModel CurrentClient = new ClientInfoModel();
-            CurrentClient.ID = Convert.ToInt32(TreeView2.SelectedNode.Tag);
-            softwareList = request.getClientPackages(client, CurrentClient);
-
-            foreach (PackageInfoModel Package in softwareList)
-            {
-                TreeNode CurrentNode = new TreeNode(Package.showName);
-                CurrentNode.Tag = Package.ID;
-                TreeView3.Nodes[0].Nodes.Add(CurrentNode);
-                TreeView3.Nodes[0].Text = TreeView3.Nodes[0].Text + " (Clientsoftware)";
-                TreeView3.Nodes[0].ForeColor = System.Drawing.Color.Red;
-            }
-        }
-
-
         private void BeendenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -561,12 +510,52 @@ using Server_Client.Forms;
 
         private void TreeView1_BeforeExpand()
         {
+            TreeView2.Nodes[0].Nodes.Clear();
+            TreeView3.Nodes[0].Nodes.Clear();
 
+            TreeView3.Nodes[0].Text = "Pakete";
+            TreeView3.Nodes[0].ForeColor = System.Drawing.Color.Black;
+
+            List<ClientInfoModel> clientList = null;
+            clientList = request.getDatabaseClients(client);
+
+            List<PackageInfoModel> softwareList = null;
+            GroupInfoModel CurrentGroup = new GroupInfoModel();
+            CurrentGroup.ID = Convert.ToInt32(TreeView1.SelectedNode.Tag);
+            softwareList = request.getGroupPackages(client, CurrentGroup);
+
+            foreach (ClientInfoModel Client in clientList)
+            {
+                TreeNode CurrentNode = new TreeNode(Client.pcName);
+                CurrentNode.Tag = Client.ID;
+                TreeView2.Nodes[0].Nodes.Add(CurrentNode);
+            }
+            foreach (PackageInfoModel Package in softwareList)
+            {
+                TreeNode CurrentNode = new TreeNode(Package.showName);
+                CurrentNode.Tag = Package.ID;
+                TreeView3.Nodes[0].Nodes.Add(CurrentNode);
+            }
+            //Lade alle Benutzer und Software der Gruppe
         }
 
         private void TreeView2_BeforeExpand()
         {
+            TreeView3.Nodes[0].Nodes.Clear();
 
+            List<PackageInfoModel> softwareList = null;
+            ClientInfoModel CurrentClient = new ClientInfoModel();
+            CurrentClient.ID = Convert.ToInt32(TreeView2.SelectedNode.Tag);
+            softwareList = request.getClientPackages(client, CurrentClient);
+
+            foreach (PackageInfoModel Package in softwareList)
+            {
+                TreeNode CurrentNode = new TreeNode(Package.showName);
+                CurrentNode.Tag = Package.ID;
+                TreeView3.Nodes[0].Nodes.Add(CurrentNode);
+                TreeView3.Nodes[0].Text = TreeView3.Nodes[0].Text + " (Clientsoftware)";
+                TreeView3.Nodes[0].ForeColor = System.Drawing.Color.Red;
+            }
         }
 
 
