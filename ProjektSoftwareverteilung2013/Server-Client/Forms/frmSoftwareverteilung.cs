@@ -401,8 +401,8 @@ using Server_Client.Forms;
             }
         }
 
-               
-        private void TreeView1_BeforeExpand()
+
+        private void TreeView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             TreeView2.Nodes[0].Nodes.Clear();
             TreeView3.Nodes[0].Nodes.Clear();
@@ -433,7 +433,7 @@ using Server_Client.Forms;
             //Lade alle Benutzer und Software der Gruppe
         }
 
-        private void TreeView2_BeforeExpand()
+        private void TreeView2_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             TreeView3.Nodes[0].Nodes.Clear();
 
@@ -538,6 +538,21 @@ using Server_Client.Forms;
         {
          frmSettings settings = new frmSettings();
          settings.ShowDialog();
+        }
+
+        private void frmSoftwareverteilung_FormClosed(object sender, FormClosedEventArgs e)
+        {
+        icoSoftwareverteilung.Visible = false;
+        }
+
+        private void TreeView1_BeforeExpand()
+        {
+
+        }
+
+        private void TreeView2_BeforeExpand()
+        {
+
         }
 
 

@@ -55,7 +55,7 @@
             // ToolStripMenuItem1
             // 
             this.ToolStripMenuItem1.Name = "ToolStripMenuItem1";
-            this.ToolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
+            this.ToolStripMenuItem1.Size = new System.Drawing.Size(142, 6);
             // 
             // btnDeleteSoftware
             // 
@@ -74,20 +74,20 @@
             this.ToolStripMenuItem1,
             this.BeendenToolStripMenuItem});
             this.BearbeitenToolStripMenuItem.Name = "BearbeitenToolStripMenuItem";
-            this.BearbeitenToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.BearbeitenToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
             this.BearbeitenToolStripMenuItem.Text = "Datei";
             // 
             // ServerToolStripMenuItem
             // 
             this.ServerToolStripMenuItem.Name = "ServerToolStripMenuItem";
-            this.ServerToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.ServerToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.ServerToolStripMenuItem.Text = "Einstellungen";
             this.ServerToolStripMenuItem.Click += new System.EventHandler(this.ServerToolStripMenuItem_Click);
             // 
             // BeendenToolStripMenuItem
             // 
             this.BeendenToolStripMenuItem.Name = "BeendenToolStripMenuItem";
-            this.BeendenToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.BeendenToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.BeendenToolStripMenuItem.Text = "Beenden";
             this.BeendenToolStripMenuItem.Click += new System.EventHandler(this.BeendenToolStripMenuItem_Click);
             // 
@@ -162,6 +162,7 @@
             treeNode2});
             this.TreeView2.Size = new System.Drawing.Size(162, 342);
             this.TreeView2.TabIndex = 13;
+            this.TreeView2.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreeView2_BeforeExpand);
             // 
             // TreeView1
             // 
@@ -175,6 +176,7 @@
             treeNode4});
             this.TreeView1.Size = new System.Drawing.Size(163, 342);
             this.TreeView1.TabIndex = 12;
+            this.TreeView1.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreeView1_BeforeExpand);
             // 
             // MenuStrip
             // 
@@ -222,6 +224,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmSoftwareverteilung";
             this.Text = "Benutzerübersicht";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmSoftwareverteilung_FormClosed);
             this.MenuStrip.ResumeLayout(false);
             this.MenuStrip.PerformLayout();
             this.ResumeLayout(false);

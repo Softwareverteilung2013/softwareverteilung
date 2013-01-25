@@ -184,5 +184,10 @@ namespace Client
             }
         }
 
+        private void frmClient_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            icoSoftwareVerteilung.Visible = false;
+        }
+
     }
 }

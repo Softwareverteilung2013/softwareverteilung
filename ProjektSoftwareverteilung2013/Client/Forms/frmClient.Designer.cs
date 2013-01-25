@@ -99,6 +99,7 @@
             this.ShowInTaskbar = false;
             this.Text = "Client";
             this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmClient_FormClosed);
             this.IconContextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
 
