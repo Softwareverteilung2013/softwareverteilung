@@ -19,8 +19,16 @@ namespace Client.Forms
         private void frmSetting_Load(object sender, EventArgs e)
         {
             txtSavePath.Text = Properties.Settings.Default.SavePath;
-            txtServerIP.Text = Properties.Settings.Default.ServerIP;
-            txtUpdateInterval.Text = Properties.Settings.Default.RequestTime;
+                     txtUpdateInterval.Text = Properties.Settings.Default.RequestTime;
+
+                     if (Properties.Settings.Default.ServerIP == "0")
+                     {
+                         txtServerIP.Text = "";
+                     }
+                     else
+                     {
+                         txtServerIP.Text = Properties.Settings.Default.ServerIP;
+                     }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

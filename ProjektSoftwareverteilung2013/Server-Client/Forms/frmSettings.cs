@@ -14,7 +14,16 @@ namespace Server_Client.Forms
         {
             InitializeComponent();
             txtSavePath.Text = Properties.Settings.Default.SavePath;
-            txtServerIP.Text = Properties.Settings.Default.ServerIP;
+
+            if (   Properties.Settings.Default.ServerIP == "0")
+            {
+                  txtServerIP.Text = "";
+            }
+            else
+            {
+                txtServerIP.Text = Properties.Settings.Default.ServerIP;
+            }
+     
         }
 
         private void btnChangeSavePath_Click(object sender, EventArgs e)
@@ -37,6 +46,7 @@ namespace Server_Client.Forms
             Properties.Settings.Default.SavePath = txtSavePath.Text + "\\Softwareverteilung";
             Properties.Settings.Default.ServerIP = txtServerIP.Text;
             Properties.Settings.Default.Save();
+            MessageBox.Show("Ihre Änderungen wurden gespeichert.");
 
             if (!System.IO.Directory.Exists(txtSavePath.Text + "\\Softwareverteilung"))
             {
