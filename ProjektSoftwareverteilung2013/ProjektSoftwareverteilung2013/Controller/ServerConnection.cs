@@ -80,9 +80,10 @@ namespace ProjektSoftwareverteilung2013.Controller
             connectionStream = tcpConnection.GetStream();
 
             StandardRequestModel request = readStream();
-            if (request.Equals(""))
+            if (request == null)
             {
                 stopConnection();
+                return;
             }
             ClientInfoModel Client = request.Client;
 
@@ -392,7 +393,7 @@ namespace ProjektSoftwareverteilung2013.Controller
                     result.successful = dataBase.gbDeleteClient(clientResult);
 
                     result.message = "";
-                    result.result = package;
+                    result.result = clientResult;
                     result.type = ResultType.delDatabaeClient;
                     break;
 
@@ -404,17 +405,21 @@ namespace ProjektSoftwareverteilung2013.Controller
                     fileController.delGroupOrder(groupResult.Name);
 
                     result.message = "";
-                    result.result = package;
+                    result.result = groupResult;
                     result.type = ResultType.delDatabaseGroup;
                     break;
 
                 case RequestTyp.delDatabaseSoftwarePackage:
 
+                    
                     packageResult = JsonConvert.DeserializeObject<PackageInfoModel>(request.requestData.ToString());
+                    group = dataBase.Converter.GetGroupByPackage(packageResult);
                     result.successful = dataBase.gbDeletePackage(packageResult);
 
+                    fileController.delSoftwarePackage(fileController.getPathFromFile(group.Name,packageResult.Name));
+
                     result.message = "";
-                    result.result = package;
+                    result.result = packageResult;
                     result.type = ResultType.delDatabaseSoftwarePackage;
                     break;
 

@@ -239,6 +239,25 @@ namespace ProjektSoftwareverteilung2013.Controller
             }
         }
 
+        public GroupInfoModel GetGroupByPackage(PackageInfoModel oPackage)
+        {
+            GroupInfoModel oResult = new GroupInfoModel();
+            string sQry;
+            DataTable oData = new DataTable();
+
+            sQry = "SELECT G.Gruppe_ID, G.Gruppe_Name FROM Gruppe_Softwarepakete AS GS LEFT JOIN Gruppe AS G ON G.Gruppe_ID = GS.Gruppe_ID WHERE GS.Softwarepaket_ID = " + oPackage.ID;
+            SqlCeDataAdapter oDataAdapter = new SqlCeDataAdapter(sQry, Connection);
+            oDataAdapter.Fill(oData);
+
+            foreach (DataRow oRow in oData.Rows)
+            {
+                oResult.ID = Convert.ToInt32(oRow["Gruppe_ID"]);
+                oResult.Name = oRow["Gruppe_Name"].ToString();
+            }
+
+            return oResult;
+        }
+
         public GroupInfoModel GetGroupByClient(ClientInfoModel oClient)
         {
             try
