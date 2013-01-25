@@ -32,6 +32,20 @@ using Server_Client.Forms;
             {
                 Directory.CreateDirectory(Server_Client.Properties.Settings.Default.SavePath + "\\Softwareverteilung");
             }
+
+            if (Server_Client.Properties.Settings.Default.ServerIP == "")
+            {
+                MessageBox.Show("Bitte geben Sie die IP des Servers an.");
+
+               frmSettings settings = new frmSettings();
+                settings.ShowDialog();
+                if (Server_Client.Properties.Settings.Default.ServerIP == "")
+                {
+                    MessageBox.Show("Sie haben keine IP für den Servers angegeben. Das Programm wird beendet.");
+                    this.Close();
+                }
+            }
+
             client.arc = GetArchitecture();
             client.macAddress = GetMacAddress();
             client.admin = GetAdminBool();
