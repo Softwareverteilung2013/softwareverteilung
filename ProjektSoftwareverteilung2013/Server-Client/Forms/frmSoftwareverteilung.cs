@@ -133,7 +133,8 @@ using Server_Client.Forms;
                     System.IO.Directory.Delete(Server_Client.Properties.Settings.Default.SavePath + "Groups\\" + TreeView1.SelectedNode.Text, true);
                     
                     GroupInfoModel CurrentGroup = new GroupInfoModel();
-                    CurrentGroup.ID = Convert.ToInt32(TreeView1.SelectedNode.Tag); 
+                    CurrentGroup.ID = Convert.ToInt32(TreeView1.SelectedNode.Tag);
+                    CurrentGroup.Name = TreeView1.SelectedNode.Text;
                     request.delGroupInfo(client, CurrentGroup);
                     
                     TreeView1.SelectedNode.Parent.Nodes.Remove(TreeView1.SelectedNode);
@@ -393,7 +394,8 @@ using Server_Client.Forms;
             if (MessageBox.Show("Möchten Sie das ausgewählte Programm/Paket aus der gewählten Gruppe löschen?", "Achtung!", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 PackageInfoModel CurrentPackage = new PackageInfoModel();
-                CurrentPackage.ID = Convert.ToInt32( TreeView3.SelectedNode.Tag);
+                CurrentPackage.ID = Convert.ToInt32(TreeView3.SelectedNode.Tag);
+                    CurrentPackage.Name = TreeView3.SelectedNode.Text;
                 request.delPackageInfo(client, CurrentPackage);
                 TreeView3.SelectedNode.Parent.Nodes.Remove(TreeView3.SelectedNode);
             }

@@ -10,6 +10,7 @@ using SVApi;
 using SVApi.Models;
 using System.Net.NetworkInformation;
 using System.Security.Principal;
+using System.Diagnostics;
 
 namespace Client
 {
@@ -29,9 +30,34 @@ namespace Client
             InfoModel.macAddress = GetMacAddress();
             InfoModel.admin = GetAdminBool();
 
-            sendRequest Request = new sendRequest(Properties.Settings.Default.ServerIP);
-            Request.sendUpdateRequest(InfoModel, Properties.Settings.Default.SavePath);
+            sendRequest Request = new sendRequest(Properties.Settings.Default.ServerIP);      
+            if (Request.sendUpdateRequest(InfoModel, Properties.Settings.Default.SavePath))
+            {
+               //Get All Zip Files, Unpack to new underfolder, Move Zip File to Another underfolder, Install Each File in First Underfolder
+            }
         }
+
+        private void UnpackZip(string ZipPath)
+        {
+
+        }
+
+        private void InstallProgramms(string ProgPath)
+        {
+            Process CurrentProcess = new Process();
+            CurrentProcess.StartInfo.FileName = ProgPath;
+            CurrentProcess.StartInfo.Arguments = "/i \"" + ProgPath + "\"/qn";
+            CurrentProcess.Start();
+        }
+
+        private void DeinstallProgramms(string ProgPath)
+        {
+            Process CurrentProcess = new Process();
+            CurrentProcess.StartInfo.FileName = "";
+            CurrentProcess.StartInfo.Arguments = "/x \"" + ProgPath + "\"/qn";
+            CurrentProcess.Start();
+        }
+
 
         private string GetMacAddress()
         {
