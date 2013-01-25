@@ -36,7 +36,8 @@ namespace ProjektSoftwareverteilung2013.Controller
 
         private IPAddress getIpAddressFromString(string ipAddress)
         {
-            IPAddress mIpAdress = IPAddress.Parse(ipAddress);
+            //IPAddress mIpAdress = IPAddress.Parse(ipAddress);
+            IPAddress mIpAdress = IPAddress.Any;
             return mIpAdress;
         }
 
@@ -263,6 +264,10 @@ namespace ProjektSoftwareverteilung2013.Controller
             GroupInfoModel group = null;
             PackageInfoModel package = null;
 
+            ClientInfoModel clientResult = null;
+            GroupInfoModel groupResult = null;
+            PackageInfoModel packageResult = null;
+
             LocalDB dataBase = new LocalDB();
             bool success = false;
             result.successful = success;
@@ -318,7 +323,8 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 case RequestTyp.getGroupClients:
 
-                    clientList = dataBase.Converter.GetGroupClients((GroupInfoModel)request.requestData);
+                    groupResult = JsonConvert.DeserializeObject<GroupInfoModel>(request.requestData.ToString());
+                    clientList = dataBase.Converter.GetGroupClients(groupResult);
 
                     result.message = "";
                     result.result = clientList;
@@ -328,7 +334,8 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 case RequestTyp.getGrupePackages:
 
-                    packageList = dataBase.Converter.GetGroupPackages((GroupInfoModel)request.requestData);
+                    groupResult = JsonConvert.DeserializeObject<GroupInfoModel>(request.requestData.ToString());
+                    packageList = dataBase.Converter.GetGroupPackages(groupResult);
 
                     result.message = "";
                     result.result = packageList;
@@ -338,7 +345,8 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 case RequestTyp.getClientPackages:
 
-                    packageList = dataBase.Converter.GetClientPackages((ClientInfoModel)request.requestData);
+                    clientResult = JsonConvert.DeserializeObject<ClientInfoModel>(request.requestData.ToString());
+                    packageList = dataBase.Converter.GetClientPackages(clientResult);
 
                     result.message = "";
                     result.result = packageList;
@@ -348,7 +356,8 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 case RequestTyp.addDatabaseClient:
 
-                    client = dataBase.gbAddClient((ClientInfoModel)request.requestData);
+                    clientResult = JsonConvert.DeserializeObject<ClientInfoModel>(request.requestData.ToString());
+                    client = dataBase.gbAddClient(clientResult);
 
                     result.message = "";
                     result.result = client;
@@ -356,8 +365,9 @@ namespace ProjektSoftwareverteilung2013.Controller
                     result.type = ResultType.addClient;
                     break;
                 case RequestTyp.addDatabaseGroup:
-
-                    group = dataBase.gbAddGroup((GroupInfoModel)request.requestData);
+                    
+                    groupResult = JsonConvert.DeserializeObject<GroupInfoModel>(request.requestData.ToString());
+                    group = dataBase.gbAddGroup(groupResult);
 
                     result.message = "";
                     result.result = group;
@@ -367,7 +377,8 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 case RequestTyp.addDatabaseSoftwarePackage:
 
-                    package = dataBase.gbAddPackage((PackageInfoModel)request.requestData);
+                    packageResult = JsonConvert.DeserializeObject<PackageInfoModel>(request.requestData.ToString());
+                    package = dataBase.gbAddPackage(packageResult);
 
                     result.message = "";
                     result.result = package;
@@ -377,7 +388,8 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 case RequestTyp.delDatabaeClient:
 
-                    result.successful = dataBase.gbDeleteClient((ClientInfoModel)request.requestData);
+                    clientResult = JsonConvert.DeserializeObject<ClientInfoModel>(request.requestData.ToString());
+                    result.successful = dataBase.gbDeleteClient(clientResult);
 
                     result.message = "";
                     result.result = package;
@@ -386,10 +398,10 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 case RequestTyp.delDatabaseGroup:
 
-                    group = (GroupInfoModel)request.requestData;
-                    result.successful = dataBase.gbDeleteGroup(group);
+                    groupResult = JsonConvert.DeserializeObject<GroupInfoModel>(request.requestData.ToString());
+                    result.successful = dataBase.gbDeleteGroup(groupResult);
 
-                    fileController.delGroupOrder(group.Name);
+                    fileController.delGroupOrder(groupResult.Name);
 
                     result.message = "";
                     result.result = package;
@@ -398,8 +410,8 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                 case RequestTyp.delDatabaseSoftwarePackage:
 
-                    package = (PackageInfoModel)request.requestData;
-                    result.successful = dataBase.gbDeletePackage(package);
+                    packageResult = JsonConvert.DeserializeObject<PackageInfoModel>(request.requestData.ToString());
+                    result.successful = dataBase.gbDeletePackage(packageResult);
 
                     result.message = "";
                     result.result = package;
