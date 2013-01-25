@@ -12,7 +12,7 @@ namespace Server_Client.Forms
 {
     public partial class frmDefaulClients : Form
     {
-        List<ClientInfoModel> ClientInfoModelArray;
+        List<ClientInfoModel> ClientInfoModelArray = new List<ClientInfoModel>();
         public frmDefaulClients()
         {
             InitializeComponent();
@@ -25,10 +25,12 @@ namespace Server_Client.Forms
 
             foreach (ClientInfoModel Client in ClientInfoModelArrayLoading)
             {
-                ListViewItem.ListViewSubItem CurrentItem = new ListViewItem.ListViewSubItem();
+                TreeNode CurrentItem = new TreeNode();
                 CurrentItem.Tag = Client.ID;
                 CurrentItem.Text = Client.pcName;
-                listView1.Items[0].SubItems.Add(CurrentItem);
+
+                treeView1.Nodes.Add(CurrentItem);
+                
             }
         }
 
@@ -41,14 +43,18 @@ namespace Server_Client.Forms
         private void btnOk_Click(object sender, EventArgs e)
         {
 
-            foreach (TreeNode Node in listView1.SelectedItems)
+            foreach (TreeNode Node in treeView1.Nodes)
             {
-                ClientInfoModel CurrentModel = new ClientInfoModel();
-                CurrentModel.ID = Convert.ToInt32( Node.Tag);
-                CurrentModel.pcName = Node.Text;
-                ClientInfoModelArray.Add(CurrentModel);
+                if (Node.Checked)
+                {
+                    ClientInfoModel CurrentModel = new ClientInfoModel();
+                    CurrentModel.ID = Convert.ToInt32(Node.Tag);
+                    CurrentModel.pcName = Node.Text;
+                    ClientInfoModelArray.Add(CurrentModel);
+                }
             }
          frmSoftwareverteilung.ClientInfoModelArray = ClientInfoModelArray;
+         this.Close();
         }
     }
 }

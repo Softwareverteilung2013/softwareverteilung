@@ -232,7 +232,10 @@ namespace SVApi
             {
                 packageInfo = new List<PackageInfoModel>();
                 JArray array = (JArray)resultInfo.result;
-                packageInfo = JsonConvert.DeserializeObject<List<PackageInfoModel>>(array.ToString());
+                if (array != null)
+                {
+                    packageInfo = JsonConvert.DeserializeObject<List<PackageInfoModel>>(array.ToString());
+                }
             }
 
             mRequest = null;
@@ -352,6 +355,11 @@ namespace SVApi
 
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
+
+            if (resultInfo.result == null)
+            {
+                return value;
+            }
 
             PackageInfoModel resultPackage = JsonConvert.DeserializeObject<PackageInfoModel>(resultInfo.result.ToString());
 

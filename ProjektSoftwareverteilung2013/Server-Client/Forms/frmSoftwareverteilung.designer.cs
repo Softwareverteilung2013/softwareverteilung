@@ -141,6 +141,8 @@
             // 
             // TreeView3
             // 
+            this.TreeView3.CheckBoxes = true;
+            this.TreeView3.HideSelection = false;
             this.TreeView3.Location = new System.Drawing.Point(349, 27);
             this.TreeView3.Name = "TreeView3";
             treeNode1.Name = "Software";
@@ -152,6 +154,8 @@
             // 
             // TreeView2
             // 
+            this.TreeView2.CheckBoxes = true;
+            this.TreeView2.HideSelection = false;
             this.TreeView2.Location = new System.Drawing.Point(181, 27);
             this.TreeView2.Name = "TreeView2";
             treeNode2.Name = "User";
@@ -159,11 +163,12 @@
             this.TreeView2.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode2});
             this.TreeView2.Size = new System.Drawing.Size(162, 342);
-            this.TreeView2.TabIndex = 13;       
+            this.TreeView2.TabIndex = 13;
             this.TreeView2.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeView2_NodeMouseClick);
             // 
             // TreeView1
             // 
+            this.TreeView1.HideSelection = false;
             this.TreeView1.Location = new System.Drawing.Point(12, 27);
             this.TreeView1.Name = "TreeView1";
             treeNode3.Name = "Groups";

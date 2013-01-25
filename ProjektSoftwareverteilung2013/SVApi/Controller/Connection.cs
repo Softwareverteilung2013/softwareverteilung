@@ -29,8 +29,17 @@ namespace SVApi.Controller
         public StandardResultModel startConnection(StandardRequestModel request)
         {
             StandardResultModel result = null;
-            string strRequest = null, strResult = null; 
-            ServerConnection = new TcpClient(IpAddress,5555);
+            string strRequest = null, strResult = null;
+
+            try
+            {
+                ServerConnection = new TcpClient(IpAddress, 5555);
+            }
+            catch (Exception)
+            {
+                return result;
+            }
+          
 
             if (!ServerConnection.Connected)
             {
@@ -196,8 +205,8 @@ namespace SVApi.Controller
 
             byte[] fileName = Encoding.ASCII.GetBytes(strName);
             byte[] fileData = File.ReadAllBytes(pathToFile);
-            byte[] fileNameLen = BitConverter.GetBytes(fileData.Length);
-            byte[] file = new byte[4 + fileName.Length + fileNameLen.Length];
+            byte[] fileNameLen = BitConverter.GetBytes(fileName.Length);
+            byte[] file = new byte[4 + fileName.Length + fileData.Length];
 
             fileNameLen.CopyTo(file, 0);
             fileName.CopyTo(file, 4);
