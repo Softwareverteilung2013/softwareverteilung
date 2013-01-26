@@ -37,8 +37,7 @@
     <StartupObject>Server_Client.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SVApi, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="SVApi">
       <HintPath>..\SVApi\bin\Debug\SVApi.dll</HintPath>
     </Reference>
     <Reference Include="System" />

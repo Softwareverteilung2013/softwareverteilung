@@ -41,7 +41,7 @@ namespace ProjektSoftwareverteilung2013.Controller
 
             if (groupName != "")
             {
-                path = ProgrammPath + "\\" + groupName;
+                path = ProgrammPath + "\\" + groupName + "\\";
             }
 
             return path;
@@ -82,9 +82,12 @@ namespace ProjektSoftwareverteilung2013.Controller
             if (name !="")
             {
                 path = ProgrammPath + "\\" + name;
+                DirectoryInfo directory = new DirectoryInfo(path);
 
                 if (Directory.Exists(path))
                 {
+                    foreach (System.IO.FileInfo file in directory.GetFiles()) file.Delete();
+                    foreach (System.IO.DirectoryInfo subDirectory in directory.GetDirectories()) subDirectory.Delete(true);
                     Directory.Delete(path);
                     return true;
                 }

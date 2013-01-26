@@ -87,12 +87,11 @@ namespace ProjektSoftwareverteilung2013.Controller
             }
             ClientInfoModel Client = request.Client;
 
-            //Aufruf der Datenbank speichern des Clients
             if (Client == null)
             {
                 stopConnection();
             }
-            loginClient(Client);
+            loginClient(request);
 
             //Verarbeitung des Request
             StandardResultModel result = getResult(request);
@@ -163,9 +162,9 @@ namespace ProjektSoftwareverteilung2013.Controller
 
             message = Encoding.ASCII.GetString(readingBytes);
             string newString = message.Trim();
-            Console.WriteLine(newString);
 
             request = JsonConvert.DeserializeObject<StandardRequestModel>(newString);
+
             return request;
         }
 
@@ -193,21 +192,21 @@ namespace ProjektSoftwareverteilung2013.Controller
         private void readFile(string strGroupName, string strPackageName)
         {
             Socket clientSock = tcpConnection.Client;
-            byte[] file = new byte[1024 * 5000];
+            byte[] ClientData = new byte[1024 * 5000];
 
             FileController fileController = new FileController();
-            string receivedPath = fileController.getPathFromFile(strGroupName, strPackageName);
+            string receivedPath = fileController.getPathFromGroup(strGroupName);
 
-            int receivedBytesLen = clientSock.Receive(file);
-            int fileNameLen = BitConverter.ToInt32(file, 0);
-            string fileName = Encoding.ASCII.GetString(file, 4, fileNameLen);
+            int receivedBytesLen = clientSock.Receive(ClientData);
+            int fileNameLen = BitConverter.ToInt32(ClientData, 0);
+            string fileName = Encoding.ASCII.GetString(ClientData, 4, fileNameLen);
 
             Console.WriteLine("Client:{0} connected & File {1} started received.", clientSock.RemoteEndPoint, fileName);
             BinaryWriter bWrite = new BinaryWriter(File.Open(receivedPath + fileName, FileMode.Append));
 
             try
             {
-                bWrite.Write(file, 4 + fileNameLen, receivedBytesLen - 4 - fileNameLen);
+                bWrite.Write(ClientData, 4 + fileNameLen, receivedBytesLen - 4 - fileNameLen);
             }
             catch (Exception ex)
             {
@@ -232,8 +231,8 @@ namespace ProjektSoftwareverteilung2013.Controller
 
             byte[] fileName = Encoding.ASCII.GetBytes(package.Name);
             byte[] fileData = File.ReadAllBytes(filePath);
-            byte[] fileNameLen = BitConverter.GetBytes(fileData.Length);
-            byte[] file = new byte[4 + fileName.Length + fileNameLen.Length];
+            byte[] fileNameLen = BitConverter.GetBytes(fileName.Length);
+            byte[] file = new byte[4 + fileName.Length + fileData.Length];
 
             fileNameLen.CopyTo(file, 0);
             fileName.CopyTo(file, 4);
@@ -427,6 +426,15 @@ namespace ProjektSoftwareverteilung2013.Controller
 
                     clientList = dataBase.Converter.GetClientInfoModels();
 
+                    if (client == null)
+                    {
+                        result.message = "";
+                        result.successful = true;
+                        result.type = ResultType.readPackage;
+                        result.result = client;
+                        break;
+                    }
+
                     for (int i = 0; i < clientList.Count; i++)
                     {
                         if (request.Client.macAddress == clientList[i].macAddress)
@@ -447,9 +455,31 @@ namespace ProjektSoftwareverteilung2013.Controller
             return result;
         }
 
-        private void loginClient(ClientInfoModel client)
+        private void loginClient(StandardRequestModel request)
         {
-            Console.WriteLine("Anmeldung Client:" + client.macAddress + " Gruppe:" + client.group + " Admin:" + client.admin);
+            ClientInfoModel client = request.Client;
+            ClientInfoModel newClient = null;
+            GroupInfoModel newGroup = null;
+            LocalDB oDB = new LocalDB();
+            newClient = oDB.gbAddClient(client);
+            newGroup = oDB.Converter.GetGroupByClient(newClient);
+            
+            string[] lines = Regex.Split(client.macAddress, "\r\n");
+            string macAddress = "";
+
+            foreach (string line in lines)
+            {
+                macAddress += line;
+            }
+
+            if (newGroup == null)
+            {
+                Console.WriteLine("Anmeldung Client:" + macAddress + " " + " Gruppe:" + client.group + " " + " Admin:" + client.admin + " " + "Request:" + request.request);
+            }
+            else
+            {
+                Console.WriteLine("Anmeldung Client:" + macAddress + " " + " Gruppe:" + newGroup.Name + " " + " Admin:" + client.admin + " " + "Request:" + request.request);
+            }
         }
 
         public void stopConnection()

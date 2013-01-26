@@ -154,18 +154,18 @@ namespace SVApi.Controller
             }
 
             Socket clientSock = ServerConnection.Client;
-            byte[] file = new byte[1024 * 5000];
+            byte[] clientData = new byte[1024 * 5000];
             //Speicherort
             string receivedPath = savePath;
 
-            int receivedBytesLen = clientSock.Receive(file);
-            int fileNameLen = BitConverter.ToInt32(file, 0);
-            string fileName = Encoding.ASCII.GetString(file, 4, fileNameLen);
+            int receivedBytesLen = clientSock.Receive(clientData);
+            int fileNameLen = BitConverter.ToInt32(clientData, 0);
+            string fileName = Encoding.ASCII.GetString(clientData, 4, fileNameLen);
 
             BinaryWriter bWrite = new BinaryWriter(File.Open(receivedPath + fileName, FileMode.Append));
             try
             {
-                bWrite.Write(file, 4 + fileNameLen, receivedBytesLen - 4 - fileNameLen);
+                bWrite.Write(clientData, 4 + fileNameLen, receivedBytesLen - 4 - fileNameLen);
             }
             catch (Exception)
             {

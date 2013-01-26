@@ -27,8 +27,33 @@ namespace ProjektSoftwareverteilung2013
             while (cmd.ToLower() != "stop")
             {
                 cmd = Console.ReadLine();
-                
-                if (cmd.ToLower().Equals("clients"))
+
+                if (cmd.ToLower().Equals("help"))
+                {
+                    string commands = CommandModel.getCommands();
+                    Console.WriteLine(commands);
+                }
+                else if (cmd.ToLower().Equals("clear"))
+                {
+                    Console.Clear();
+                }
+                else if (cmd.ToLower().Equals("delPackage"))
+                {
+                    Console.WriteLine("Noch nicht Implementiert");
+                }
+                else if (cmd.ToLower().Equals("delGroup"))
+                {
+                    Console.WriteLine("Noch nicht Implementiert");
+                }
+                else if (cmd.ToLower().Equals("packages"))
+                {
+                    Console.WriteLine("Noch nicht Implementiert");
+                }
+                else if (cmd.ToLower().Equals("groups"))
+                {
+                    Console.WriteLine("Noch nicht Implementiert");
+                }
+                else if (cmd.ToLower().Equals("clients"))
                 {
                     List<ClientInfoModel> oList = oDB.Converter.GetClientInfoModels();
 
