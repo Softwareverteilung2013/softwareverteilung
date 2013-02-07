@@ -1,24 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.IO.Packaging;
 
 namespace Server_Client.Classes
 {
-    using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Packaging;
- 
+     
 public static class clsZipFile
 {
-    public static void ZipFiles(string path, IEnumerable<string> files, CompressionOption compressionLevel)
-    {
-        using (FileStream fileStream = new FileStream(path, FileMode.Create))
-        {
-            clsZipFile.ZipFilesToStream(fileStream, files, compressionLevel);
-        }
-    }
-
     public static void Unzip(string zipPath, string baseFolder)
     {
         using (FileStream fileStream = new FileStream(zipPath, FileMode.Open))
@@ -27,25 +16,6 @@ public static class clsZipFile
         }
     }
 
-    private static void ZipFilesToStream(FileStream destination, IEnumerable<string> files, CompressionOption compressionLevel)
-    {
-        using (Package package = Package.Open(destination, FileMode.Create))
-        {
-            foreach (string path in files)
-            {
-                Uri fileUri = new Uri(@"/" + Path.GetFileName(path), UriKind.Relative);
-                string contentType = @"data/" + clsZipFile.GetFileExtentionName(path);
- 
-                using (Stream zipStream = package.CreatePart(fileUri, contentType, compressionLevel).GetStream())
-                {
-
-                    CopyToStream(destination, zipStream);
-
-                }
-            }
-        }
-    }
- 
     private static void UnzipFilesFromStream(Stream source, string baseFolder)
     {
         if (!Directory.Exists(baseFolder))
@@ -69,27 +39,6 @@ public static class clsZipFile
             }
         }
     }
- 
-    private static string GetFileExtentionName(string path)
-    {
-        string extention = Path.GetExtension(path);
-        if (!string.IsNullOrEmpty(extention) && extention.StartsWith("."))
-        {
-            extention = extention.Substring(1);
-        }
- 
-        return extention;
-    }
-
-    public static void CopyToStream(FileStream input, Stream output)
-    {
-        byte[] buffer = new byte[32768];
-        int read;
-        while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-        {
-            output.Write(buffer, 0, read);
-        }
-    }
 
     public static void CopyToFileStream(Stream input, FileStream output)
     {
@@ -99,6 +48,48 @@ public static class clsZipFile
         {
             output.Write(buffer, 0, read);
         }
+    }
+
+    private const string PackageRelationshipType = @"http://schemas.microsoft.com/opc/2006/sample/document";
+    private const string ResourceRelationshipType = @"http://schemas.microsoft.com/opc/2006/ample/required-resource";
+
+    /// <summary>
+    ///   Creates a package zip file containing specified
+    ///   content and resource files.</summary>
+    public static void CreatePackage(string packagePath, string documentPath)
+    {
+
+        Uri partUriDocument = PackUriHelper.CreatePartUri(
+                                  new Uri(documentPath, UriKind.Relative));
+
+        using (Package package =
+            Package.Open(packagePath, FileMode.Create))
+        {
+            PackagePart packagePartDocument =
+              package.CreatePart(partUriDocument,
+                             System.Net.Mime.MediaTypeNames.Text.Xml);
+
+            using (FileStream fileStream = new FileStream(
+                  documentPath, FileMode.Open, FileAccess.Read))
+            {
+                CopyStream(fileStream, packagePartDocument.GetStream());
+            }
+        }
+    }
+
+    /// <summary>
+    ///   Copies data from a source stream to a target stream.</summary>
+    /// <param name="source">
+    ///   The source stream to copy from.</param>
+    /// <param name="target">
+    ///   The destination stream to copy to.</param>
+    private static void CopyStream(Stream source, Stream target)
+    {
+        const int bufSize = 0x1000;
+        byte[] buf = new byte[bufSize];
+        int bytesRead = 0;
+        while ((bytesRead = source.Read(buf, 0, bufSize)) > 0)
+            target.Write(buf, 0, bytesRead);
     }
 
 }

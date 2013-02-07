@@ -320,6 +320,8 @@ using Server_Client.Forms;
                 int counter = 0;
             
                 string archit = "32bit";
+                string Path = Server_Client.Properties.Settings.Default.SavePath + "Groups\\" + TreeView1.SelectedNode.Text + "\\";
+                Guid PacketGuid = Guid.NewGuid();
                 foreach (string File in FileDialog.FileNames)
                 {
                     //Assembly ExeAssembly = Assembly.LoadFile(File);
@@ -331,17 +333,18 @@ using Server_Client.Forms;
                     //}
                     //archit = AssemblyAr.ProcessorArchitecture.ToString();
 
+                      clsZipFile.CreatePackage(Path + PacketGuid + ".zip", File);
                     FileArray[counter] = File;
                     counter++;
                 }
-                Guid PacketGuid = Guid.NewGuid();
+              
 
-                string Path = Server_Client.Properties.Settings.Default.SavePath + "Groups\\" + TreeView1.SelectedNode.Text + "\\";
+             
                 if (!Directory.Exists(Path))
                 {
                     Directory.CreateDirectory(Path);
                 }
-                clsZipFile.ZipFiles(Path + PacketGuid + ".zip", FileArray, System.IO.Packaging.CompressionOption.Normal);
+              
                 NewListMainItem.Expand();
 
                 //Assembly assembly = Assembly.LoadFile(Path + PacketGuid + ".zip");
