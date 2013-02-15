@@ -43,9 +43,11 @@ namespace ProjektSoftwareverteilung2013.Controller
 
         private void RunNewConnection()
         {
+            Console.WriteLine("Wartet auf Client");
             while (true)
             {
                 TcpClient c = listener.AcceptTcpClient();
+                Console.WriteLine("Client " + c.Client.RemoteEndPoint.ToString().Substring(0,c.Client.RemoteEndPoint.ToString().Length - 6) + " hat sich mit dem Server verbunden");
                 threads.Add(new ServerThread(c));
             }
         }
@@ -72,10 +74,13 @@ namespace ProjektSoftwareverteilung2013.Controller
     {
         private TcpClient tcpConnection = null;
         private Stream connectionStream = null;
+        FileController fileController = null;
+        LocalDB dataBase = null;
 
         public ServerThread(TcpClient connection)
         {
-            LocalDB dataBase = null;
+            dataBase = new LocalDB();
+            fileController = new FileController();
             tcpConnection = connection;
             connectionStream = tcpConnection.GetStream();
 
@@ -102,7 +107,6 @@ namespace ProjektSoftwareverteilung2013.Controller
             {
                 List<PackageInfoModel> packageList = (List<PackageInfoModel>)result.result;
                 GroupInfoModel group = null;
-                dataBase = new LocalDB();
 
                 if (packageList.Count != 0)
                 {
@@ -254,205 +258,325 @@ namespace ProjektSoftwareverteilung2013.Controller
 
         private StandardResultModel getResult(StandardRequestModel request)
         {
-            StandardResultModel result = new StandardResultModel();
-            FileController fileController = new FileController();
-            List<ClientInfoModel> clientList = null;
-            List<GroupInfoModel> groupList = null;
-            List<PackageInfoModel> packageList = null;
-
-            ClientInfoModel client = null;
-            GroupInfoModel group = null;
-            PackageInfoModel package = null;
-
-            ClientInfoModel clientResult = null;
-            GroupInfoModel groupResult = null;
-            PackageInfoModel packageResult = null;
-
-            LocalDB dataBase = new LocalDB();
-            bool success = false;
-            result.successful = success;
-
+            StandardResultModel result = null;
             switch (request.request)
             {
                 case RequestTyp.upDateRequest:
-
-                    packageList = dataBase.CheckSoftwareClient(request.Client);
-                    result.successful = true;
-                    if (packageList.Count == 0)
-                    {
-                        result.type = ResultType.defaultInfo;
-                    }
-                    else
-                    {
-                        result.type = ResultType.sendPackage;
-
-                    }
-
-                    result.result = packageList;
+                    result = upDateRequest(request);
                     break;
 
                 case RequestTyp.getDatabaseGroups:
-
-                    groupList = dataBase.Converter.GetGroupInfoModels();
-
-                    result.message = "";
-                    result.result = groupList;
-                    result.successful = true;
-                    result.type = ResultType.GroupInfo;
+                    result = getDatabaseGroups(request);
                     break;
 
                 case RequestTyp.getDatabaseClients:
-
-                    clientList = dataBase.Converter.GetClientInfoModels();
-
-                    result.message = "";
-                    result.result = clientList;
-                    result.successful = true;
-                    result.type = ResultType.ClientInfo;
+                    result = getDatabaseClients(request);
                     break;
 
                 case RequestTyp.getDatabaseSoftwarePackages:
-
-                    packageList = dataBase.Converter.GetPackageInfoModels();
-
-                    result.message = "";
-                    result.result = packageList;
-                    result.successful = true;
-                    result.type = ResultType.SoftwarePackagesInfo;
+                    result = getDatabaseSoftwarePackages(request);
                     break;
 
                 case RequestTyp.getGroupClients:
-
-                    groupResult = JsonConvert.DeserializeObject<GroupInfoModel>(request.requestData.ToString());
-                    clientList = dataBase.Converter.GetGroupClients(groupResult);
-
-                    result.message = "";
-                    result.result = clientList;
-                    result.successful = true;
-                    result.type = ResultType.GroupClients;
+                    result = getGroupClients(request);
                     break;
 
                 case RequestTyp.getGrupePackages:
-
-                    groupResult = JsonConvert.DeserializeObject<GroupInfoModel>(request.requestData.ToString());
-                    packageList = dataBase.Converter.GetGroupPackages(groupResult);
-
-                    result.message = "";
-                    result.result = packageList;
-                    result.successful = true;
-                    result.type = ResultType.GrupePackages;
+                    result = getGrupePackages(request);
                     break;
 
                 case RequestTyp.getClientPackages:
-
-                    clientResult = JsonConvert.DeserializeObject<ClientInfoModel>(request.requestData.ToString());
-                    packageList = dataBase.Converter.GetClientPackages(clientResult);
-
-                    result.message = "";
-                    result.result = packageList;
-                    result.successful = true;
-                    result.type = ResultType.ClientPackages;
+                    result = getClientPackages(request);
                     break;
 
                 case RequestTyp.addDatabaseClient:
-
-                    clientResult = JsonConvert.DeserializeObject<ClientInfoModel>(request.requestData.ToString());
-                    client = dataBase.gbAddClient(clientResult);
-
-                    result.message = "";
-                    result.result = client;
-                    result.successful = true;
-                    result.type = ResultType.addClient;
+                    result = addDatabaseClient(request);
                     break;
                 case RequestTyp.addDatabaseGroup:
-                    
-                    groupResult = JsonConvert.DeserializeObject<GroupInfoModel>(request.requestData.ToString());
-                    group = dataBase.gbAddGroup(groupResult);
-
-                    result.message = "";
-                    result.result = group;
-                    result.successful = fileController.creatGroupOrder(group.Name);
-                    result.type = ResultType.addGroup;
+                    result = addDatabaseGroup(request);
                     break;
 
                 case RequestTyp.addDatabaseSoftwarePackage:
-
-                    packageResult = JsonConvert.DeserializeObject<PackageInfoModel>(request.requestData.ToString());
-                    package = dataBase.gbAddPackage(packageResult);
-
-                    result.message = "";
-                    result.result = package;
-                    result.successful = true;
-                    result.type = ResultType.addPackage;
+                    result = addDatabaseSoftwarePackage(request);
                     break;
 
                 case RequestTyp.delDatabaeClient:
-
-                    clientResult = JsonConvert.DeserializeObject<ClientInfoModel>(request.requestData.ToString());
-                    result.successful = dataBase.gbDeleteClient(clientResult);
-
-                    result.message = "";
-                    result.result = clientResult;
-                    result.type = ResultType.delDatabaeClient;
+                    result = delDatabaeClient(request);
                     break;
 
                 case RequestTyp.delDatabaseGroup:
-
-                    groupResult = JsonConvert.DeserializeObject<GroupInfoModel>(request.requestData.ToString());
-                    result.successful = dataBase.gbDeleteGroup(groupResult);
-
-                    fileController.delGroupOrder(groupResult.Name);
-
-                    result.message = "";
-                    result.result = groupResult;
-                    result.type = ResultType.delDatabaseGroup;
+                    result = delDatabaseGroup(request);
                     break;
 
                 case RequestTyp.delDatabaseSoftwarePackage:
-
-                    
-                    packageResult = JsonConvert.DeserializeObject<PackageInfoModel>(request.requestData.ToString());
-                    group = dataBase.Converter.GetGroupByPackage(packageResult);
-                    result.successful = dataBase.gbDeletePackage(packageResult);
-
-                    fileController.delSoftwarePackage(fileController.getPathFromFile(group.Name,packageResult.Name));
-
-                    result.message = "";
-                    result.result = packageResult;
-                    result.type = ResultType.delDatabaseSoftwarePackage;
+                    result = delDatabaseSoftwarePackage(request);
                     break;
 
                 case RequestTyp.sendSoftwarePackage:
-
-                    clientList = dataBase.Converter.GetClientInfoModels();
-
-                    if (client == null)
-                    {
-                        result.message = "";
-                        result.successful = true;
-                        result.type = ResultType.readPackage;
-                        result.result = client;
-                        break;
-                    }
-
-                    for (int i = 0; i < clientList.Count; i++)
-                    {
-                        if (request.Client.macAddress == clientList[i].macAddress)
-                        {
-                            client = clientList[i];
-                        }
-                    }
-
-                    result.message = "";
-                    result.successful = true;
-                    result.type = ResultType.readPackage;
-                    result.result = client;
+                    result = sendSoftwarePackage(request);
                     break;
 
                 default:
                     break;
             }
             return result;
+        }
+
+        private StandardResultModel upDateRequest(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            List<PackageInfoModel> packageList = null;
+
+            packageList = dataBase.CheckSoftwareClient(request.Client);
+            result.successful = true;
+            if (packageList.Count == 0)
+            {
+                result.type = ResultType.defaultInfo;
+            }
+            else
+            {
+                result.type = ResultType.sendPackage;
+
+            }
+
+            result.result = packageList;
+
+            return result;
+        }
+
+        private StandardResultModel getDatabaseGroups(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            List<GroupInfoModel> groupList = null;
+
+            groupList = dataBase.Converter.GetGroupInfoModels();
+
+            result.message = "";
+            result.result = groupList;
+            result.successful = true;
+            result.type = ResultType.GroupInfo;
+
+            return result;
+        }
+
+        private StandardResultModel getDatabaseClients(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            List<ClientInfoModel> clientList = null;
+
+            clientList = dataBase.Converter.GetClientInfoModels();
+
+            result.message = "";
+            result.result = clientList;
+            result.successful = true;
+            result.type = ResultType.ClientInfo;
+
+            return result;
+        }
+
+        private StandardResultModel getDatabaseSoftwarePackages(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            List<PackageInfoModel> packageList = null;
+
+            packageList = dataBase.Converter.GetPackageInfoModels();
+
+            result.message = "";
+            result.result = packageList;
+            result.successful = true;
+            result.type = ResultType.SoftwarePackagesInfo;
+
+            return result;
+        }
+
+        private StandardResultModel getGroupClients(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            GroupInfoModel groupResult = null;
+            List<ClientInfoModel> clientList = null;
+
+            groupResult = JsonConvert.DeserializeObject<GroupInfoModel>(request.requestData.ToString());
+            clientList = dataBase.Converter.GetGroupClients(groupResult);
+
+            result.message = "";
+            result.result = clientList;
+            result.successful = true;
+            result.type = ResultType.GroupClients;
+
+            return result;
+        }
+
+        private StandardResultModel getGrupePackages(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            GroupInfoModel groupResult = null;
+            List<PackageInfoModel> packageList = null;
+
+            groupResult = JsonConvert.DeserializeObject<GroupInfoModel>(request.requestData.ToString());
+            packageList = dataBase.Converter.GetGroupPackages(groupResult);
+
+            result.message = "";
+            result.result = packageList;
+            result.successful = true;
+            result.type = ResultType.GrupePackages;
+
+            return result;
+        }
+
+        private StandardResultModel getClientPackages(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            ClientInfoModel clientResult = null;
+            List<PackageInfoModel> packageList = null;
+
+            clientResult = JsonConvert.DeserializeObject<ClientInfoModel>(request.requestData.ToString());
+            packageList = dataBase.Converter.GetClientPackages(clientResult);
+
+            result.message = "";
+            result.result = packageList;
+            result.successful = true;
+            result.type = ResultType.ClientPackages;
+
+            return result;
+        }
+
+        private StandardResultModel addDatabaseClient(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            ClientInfoModel clientResult = null;
+            ClientInfoModel client = null;
+
+            clientResult = JsonConvert.DeserializeObject<ClientInfoModel>(request.requestData.ToString());
+            client = dataBase.gbAddClient(clientResult);
+
+            result.message = "";
+            result.result = client;
+            result.successful = true;
+            result.type = ResultType.addClient;
+
+            return result;
+        }
+
+        private StandardResultModel addDatabaseGroup(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            GroupInfoModel groupResult = null;
+            GroupInfoModel group = null;
+
+            groupResult = JsonConvert.DeserializeObject<GroupInfoModel>(request.requestData.ToString());
+            group = dataBase.gbAddGroup(groupResult);
+
+            result.message = "";
+            result.result = group;
+            result.successful = fileController.creatGroupOrder(group.Name);
+            result.type = ResultType.addGroup;
+
+            return result;
+        }
+
+        private StandardResultModel addDatabaseSoftwarePackage(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            PackageInfoModel package = null;
+            PackageInfoModel packageResult = null;
+
+            packageResult = JsonConvert.DeserializeObject<PackageInfoModel>(request.requestData.ToString());
+            package = dataBase.gbAddPackage(packageResult);
+
+            result.message = "";
+            result.result = package;
+            result.successful = true;
+            result.type = ResultType.addPackage;
+
+            return result;
+        }
+
+        private StandardResultModel delDatabaeClient(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            ClientInfoModel clientResult = null;
+
+
+            clientResult = JsonConvert.DeserializeObject<ClientInfoModel>(request.requestData.ToString());
+            result.successful = dataBase.gbDeleteClient(clientResult);
+
+            result.message = "";
+            result.result = clientResult;
+            result.type = ResultType.delDatabaeClient;
+
+            return result;
+        }
+
+        private StandardResultModel delDatabaseGroup(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            GroupInfoModel groupResult = null;
+
+            groupResult = JsonConvert.DeserializeObject<GroupInfoModel>(request.requestData.ToString());
+            result.successful = dataBase.gbDeleteGroup(groupResult);
+
+            fileController.delGroupOrder(groupResult.Name);
+
+            result.message = "";
+            result.result = groupResult;
+            result.type = ResultType.delDatabaseGroup;
+
+            return result;
+        }
+
+        private StandardResultModel delDatabaseSoftwarePackage(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            PackageInfoModel packageResult = null;
+            GroupInfoModel group = null;
+            
+            LocalDB dataBase = new LocalDB();
+
+            packageResult = JsonConvert.DeserializeObject<PackageInfoModel>(request.requestData.ToString());
+            group = dataBase.Converter.GetGroupByPackage(packageResult);
+            result.successful = dataBase.gbDeletePackage(packageResult);
+
+            fileController.delSoftwarePackage(fileController.getPathFromFile(group.Name, packageResult.Name));
+
+            result.message = "";
+            result.result = packageResult;
+            result.type = ResultType.delDatabaseSoftwarePackage;
+
+            return result;
+        }
+
+        private StandardResultModel sendSoftwarePackage(StandardRequestModel request)
+        {
+            StandardResultModel result = new StandardResultModel();
+            //List<ClientInfoModel> clientList = null;
+            ClientInfoModel client = null;
+            LocalDB dataBase = new LocalDB();
+
+            //clientList = dataBase.Converter.GetClientInfoModels();
+
+            //if (client == null)
+            //{
+                result.message = "";
+                result.successful = true;
+                result.type = ResultType.readPackage;
+                result.result = client;
+                return result;
+            //}
+
+            //for (int i = 0; i < clientList.Count; i++)
+            //{
+            //    if (request.Client.macAddress == clientList[i].macAddress)
+            //    {
+            //        client = clientList[i];
+            //    }
+            //}
+
+            //result.message = "";
+            //result.successful = true;
+            //result.type = ResultType.readPackage;
+            //result.result = client;
+
+            //return result;
         }
 
         private void loginClient(StandardRequestModel request)
@@ -474,11 +598,11 @@ namespace ProjektSoftwareverteilung2013.Controller
 
             if (newGroup == null)
             {
-                Console.WriteLine("Anmeldung Client:" + macAddress + " " + " Gruppe:" + client.group + " " + " Admin:" + client.admin + " " + "Request:" + request.request);
+                Console.WriteLine("Anmeldung Client:" + macAddress + " " + " Gruppe:" + client.group + " " + " Admin:" + client.admin + "\n" + "Request:" + request.request);
             }
             else
             {
-                Console.WriteLine("Anmeldung Client:" + macAddress + " " + " Gruppe:" + newGroup.Name + " " + " Admin:" + client.admin + " " + "Request:" + request.request);
+                Console.WriteLine("Anmeldung Client:" + macAddress + " " + " Gruppe:" + newGroup.Name + " " + " Admin:" + client.admin + "\n" + "Request:" + request.request);
             }
         }
 

@@ -51,7 +51,37 @@ namespace ProjektSoftwareverteilung2013
                 }
                 else if (cmd.ToLower().Equals("groups"))
                 {
-                    Console.WriteLine("Noch nicht Implementiert");
+                    List<GroupInfoModel> groups = oDB.Converter.GetGroupInfoModels();
+
+                    string groupNames = "";
+
+                    foreach (var group in groups)
+                    {
+                        groupNames = "ID:" + group.ID + " Name:" + group.Name;
+                        Console.WriteLine(groupNames);
+                    }
+                }
+                else if (cmd.ToLower().Equals("groupclients"))
+                {
+                    List<GroupInfoModel> groups = oDB.Converter.GetGroupInfoModels();
+
+                    for (int i = 0; i < groups.Count; i++)
+                    {
+                        Console.WriteLine("ID:" + groups[i].ID + " Name:" + groups[i].Name);
+                        Console.WriteLine();
+
+                        List<ClientInfoModel> clients = oDB.Converter.GetGroupClients(groups[i]);
+
+                        string groupNames = "";
+
+                        foreach (var client in clients)
+                        {
+                            groupNames = "ID:" + client.ID + " pcName:" + client.pcName;
+                            Console.WriteLine(groupNames);
+                        }
+                        Console.WriteLine();
+                    }
+                    
                 }
                 else if (cmd.ToLower().Equals("clients"))
                 {

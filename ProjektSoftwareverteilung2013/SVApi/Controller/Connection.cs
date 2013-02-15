@@ -6,6 +6,7 @@ using SVApi.Models;
 using System.IO;
 using ProjektSoftwareverteilung2013.Controller;
 using System.Diagnostics;
+using Newtonsoft;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 
@@ -52,8 +53,17 @@ namespace SVApi.Controller
             {
                 return result;
             }
-            strRequest = JsonConvert.SerializeObject(request);
-            sendStringStream(strRequest);
+
+            try
+            {
+                strRequest = JsonConvert.SerializeObject(request);
+                sendStringStream(strRequest);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
 
             strResult = readStream();
 

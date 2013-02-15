@@ -113,7 +113,7 @@ namespace ProjektSoftwareverteilung2013.Controller
 
             File.Delete(pathTofile);
 
-            return false;
+            return true;
         }
     }
 }

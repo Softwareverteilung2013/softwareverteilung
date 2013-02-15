@@ -14,10 +14,11 @@ namespace ProjektSoftwareverteilung2013.Models
         private static string delGroup = "delGroup        Löscht die übergebene Gruppe (Group Name)\n";
         private static string clear = "clear           Bereinigt die Konsole";
         private static string delPackage = "delPackage      Löscht das übergeben Paket (Package Name | Package ID)\n";
+        private static string groupClients = "GroupClients    Gibt alle Clients der Grouppe zurück";
 
         public static string getCommands()
         {
-            string commands = clients + groups + packages + delGroup + delPackage + clear + stop;
+            string commands = clients + groups + groupClients + packages + delGroup + delPackage + clear + stop;
             return commands;
         }
 

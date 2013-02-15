@@ -16,6 +16,9 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Security.Principal;
 using Server_Client.Forms;
+using System.Management;
+using System.Net;
+using System.Runtime.InteropServices;
 
     public partial class frmSoftwareverteilung : Form
     {
@@ -23,6 +26,9 @@ using Server_Client.Forms;
         public static List<ClientInfoModel> ClientInfoModelArray;
         public static sendRequest request;
         public static ClientInfoModel client = new ClientInfoModel();
+        [DllImport("iphlpapi.dll")]
+        public static extern int SendARP(int DestIP, int SrcIP, [Out] byte[] pMacAddr, ref int PhyAddrLen);
+
         public frmSoftwareverteilung()
         {
             InitializeComponent();
@@ -46,27 +52,64 @@ using Server_Client.Forms;
                 }
             }
 
+            string HostName = Dns.GetHostName();
+            IPAddress[] ownIpAddress = Dns.GetHostAddresses(HostName);
+            string strIpAdresse = "";
+         
+            for (int i = 0; i < ownIpAddress.Length; i++)
+            {
+                IPAddress ip = ownIpAddress[i];
+                string currentAddress = ip.ToString();
+                if (ip != null && currentAddress.Length >= 7 && currentAddress.Length <= 15)
+                {
+                    strIpAdresse = ownIpAddress[i].ToString();
+                    break;
+                }
+            }
+            
+
             client.arc = GetArchitecture();
-            client.macAddress = GetMacAddress();
+            client.macAddress = GetMacAddress(strIpAdresse);
             client.admin = GetAdminBool();
 
-            List<GroupInfoModel> clientList = null;
+            List<GroupInfoModel> groupList = null;
 
             try
             {
-            request = new sendRequest(Server_Client.Properties.Settings.Default.ServerIP);
-            clientList = request.getDatabaseGroups(client);
+                string ipAddress = Server_Client.Properties.Settings.Default.ServerIP;
+                request = new sendRequest(ipAddress);
+                groupList = request.getDatabaseGroups(client);
+
+                if (groupList == null)
+                {
+                    MessageBox.Show("Probleme beim Herstellen einer Verbindung. Bitte überprüfen Sie Ihre Einstellungen.");
+
+                    frmSettings settings = new frmSettings();
+                    settings.ShowDialog();
+
+                    try
+                    {
+                        groupList = request.getDatabaseGroups(client);
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Verbindung kann nicht hergestellt werden. Anwendung wird beendet.");
+                        this.Close();
+                    }
+
+                    return;
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Probleme beim Herstellen einer Verbindung. Bitte überprüfen Sie Ihre Einstellungen.");
+                MessageBox.Show("Probleme beim Herstellen einer Verbindung. Bitte überprüfen Sie Ihre Einstellungen." + ex.Message);
 
                 frmSettings settings = new frmSettings();
                 settings.ShowDialog();
 
                 try
                 {
-                clientList = request.getDatabaseGroups(client);
+                groupList = request.getDatabaseGroups(client);
                 }
                 catch (Exception)
                 {
@@ -77,14 +120,12 @@ using Server_Client.Forms;
                 return;
             }
           
-            foreach (GroupInfoModel Group in clientList)
+            foreach (GroupInfoModel Group in groupList)
             {
                 TreeNode CurrentGroup = new TreeNode(Group.Name);
                 CurrentGroup.Tag = Group.ID;
                 TreeView1.Nodes[0].Nodes.Add(CurrentGroup);
             }
-
-           
         }
 
 
@@ -514,29 +555,40 @@ using Server_Client.Forms;
         }
 
 
-        private string GetMacAddress()
+        private string GetMacAddress(string IP)
         {
-            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
-            //for each j you can get the MAC
-            PhysicalAddress address = nics[0].GetPhysicalAddress();
-            StringBuilder strb = new StringBuilder();
-            for (int e = 0; e < nics.Length; e++)
-            {
-                byte[] bytes = address.GetAddressBytes();
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    // Display the physical address in hexadecimal.
-                    strb.AppendLine(bytes[i].ToString("X2"));
-                    // Insert a hyphen after each byte, unless we are at the end of the
-                    // address.
-                    if (i != bytes.Length - 1)
-                    {
-                        strb.AppendLine("-");
-                    }
-                }
-            }
+            //NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
+            ////for each j you can get the MAC
+            //PhysicalAddress address = nics[0].GetPhysicalAddress();
+            //StringBuilder strb = new StringBuilder();
+            //for (int e = 0; e < nics.Length; e++)
+            //{
+            //    byte[] bytes = address.GetAddressBytes();
+            //    for (int i = 0; i < bytes.Length; i++)
+            //    {
+            //        // Display the physical address in hexadecimal.
+            //        strb.AppendLine(bytes[i].ToString("X2"));
+            //        // Insert a hyphen after each byte, unless we are at the end of the
+            //        // address.
+            //        if (i != bytes.Length - 1)
+            //        {
+            //            strb.AppendLine("-");
+            //        }
+            //    }
+            //}
 
-            return strb.ToString();
+            //return strb.ToString();
+
+            IPAddress addr = IPAddress.Parse(IP);
+            byte[] mac = new byte[6];
+            byte[] ipAddressBytes = addr.GetAddressBytes();
+            int length = mac.Length;
+            //SendARP((int)addr.Address, 0, mac, ref length);
+            int currentAddress = BitConverter.ToInt32(ipAddressBytes,0);
+            SendARP(currentAddress, 0, mac, ref length);
+            string macAddress = BitConverter.ToString(mac, 0, length);
+            return macAddress;
+
         }
 
         private bool GetAdminBool()

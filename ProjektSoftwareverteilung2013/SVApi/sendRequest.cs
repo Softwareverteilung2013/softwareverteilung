@@ -37,6 +37,11 @@ namespace SVApi
             }
 
             resultInfo = mConnection.startConnection(mRequest);
+
+            if (resultInfo == null)
+            {
+                return value;
+            }
             
 
             if (resultInfo.successful && resultInfo.type == ResultType.sendPackage)
@@ -69,6 +74,11 @@ namespace SVApi
 
             resultInfo = mConnection.startConnection(mRequest);
 
+            if (resultInfo == null)
+            {
+                return false;
+            }
+
             if (resultInfo.successful && resultInfo.type == ResultType.readPackage)
             {
                 value = mConnection.sendFile(filePath);
@@ -100,6 +110,11 @@ namespace SVApi
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
+            if (resultInfo == null)
+            {
+                return clientInfo;
+            }
+
             if (resultInfo.successful && resultInfo.type == ResultType.ClientInfo)
             {
                 clientInfo = new List<ClientInfoModel>();
@@ -128,9 +143,22 @@ namespace SVApi
             {
                 return groupInfo;
             }
-       
-            resultInfo = mConnection.startConnection(mRequest);
+
+            try
+            {
+                resultInfo = mConnection.startConnection(mRequest);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
             mConnection.closeConnection();
+
+            if (resultInfo == null)
+            {
+                return null;
+            }
 
             if (resultInfo.successful && resultInfo.type == ResultType.GroupInfo)
             {
@@ -164,6 +192,11 @@ namespace SVApi
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
+            if (resultInfo == null)
+            {
+                return packageInfo;
+            }
+
             if (resultInfo.successful && resultInfo.type == ResultType.SoftwarePackagesInfo)
             {
                 packageInfo = new List<PackageInfoModel>();
@@ -196,6 +229,11 @@ namespace SVApi
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
+            if (resultInfo == null)
+            {
+                return clientInfo;
+            }
+
             if (resultInfo.successful && resultInfo.type == ResultType.GroupClients)
             {
                 clientInfo = new List<ClientInfoModel>();
@@ -227,6 +265,11 @@ namespace SVApi
 
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
+
+            if (resultInfo == null)
+            {
+                return packageInfo;
+            }
 
             if (resultInfo.successful && resultInfo.type == ResultType.GrupePackages)
             {
@@ -263,6 +306,11 @@ namespace SVApi
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
+            if (resultInfo == null)
+            {
+                return packageInfo;
+            }
+
             if (resultInfo.successful && resultInfo.type == ResultType.GrupePackages)
             {
                 packageInfo = new List<PackageInfoModel>();
@@ -293,6 +341,11 @@ namespace SVApi
 
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
+
+            if (resultInfo == null)
+            {
+                return value;
+            }
 
             ClientInfoModel resultClient = JsonConvert.DeserializeObject<ClientInfoModel>(resultInfo.result.ToString());
 
@@ -325,6 +378,11 @@ namespace SVApi
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
+            if (resultInfo == null)
+            {
+                return value;
+            }
+
             GroupInfoModel resultGroup = JsonConvert.DeserializeObject<GroupInfoModel>(resultInfo.result.ToString());
 
             if (resultInfo.successful && resultInfo.type == ResultType.addGroup)
@@ -355,6 +413,11 @@ namespace SVApi
 
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
+
+            if (resultInfo == null)
+            {
+                return value;
+            }
 
             if (resultInfo.result == null)
             {
@@ -392,6 +455,11 @@ namespace SVApi
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
+            if (resultInfo == null)
+            {
+                return value;
+            }
+
             if (resultInfo.successful && resultInfo.type == ResultType.delDatabaeClient)
             {
                 value = true;
@@ -421,6 +489,11 @@ namespace SVApi
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
 
+            if (resultInfo == null)
+            {
+                return value;
+            }
+
             if (resultInfo.successful && resultInfo.type == ResultType.delDatabaseGroup)
             {
                 value = true;
@@ -449,6 +522,11 @@ namespace SVApi
 
             resultInfo = mConnection.startConnection(mRequest);
             mConnection.closeConnection();
+
+            if (resultInfo == null)
+            {
+                return value;
+            }
 
             if (resultInfo.successful && resultInfo.type == ResultType.delDatabaseSoftwarePackage)
             {
